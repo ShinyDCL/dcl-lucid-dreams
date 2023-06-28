@@ -4,15 +4,15 @@ import { messageLabelManager } from '../ui'
 import { GameArea, Tile } from './components'
 import { createGameArea } from './gameArea'
 import { gameManager } from './gameManager'
-import { Difficulty } from './types'
 import { Color3, Vector3 } from '@dcl/sdk/math'
 import { sceneMiddle, sceneSize, yOffset } from '../resources'
 import { movePlayerTo } from '~system/RestrictedActions'
+import { getRoundCount } from './gameConfiguration'
 
 export const initializeGameArea = (parent: Entity) => {
   cleanup()
   gameManager.initializeGame()
-  createGameArea(Difficulty.VeryEasy, parent)
+  createGameArea(gameManager.getRound(), parent)
   createTriggerLayer()
 }
 
@@ -34,8 +34,7 @@ export const initializeRound = (parent: Entity) => {
 
 export const startRound = (parent: Entity) => {
   cleanup()
-  const difficulty = gameManager.getDifficulty()
-  createGameArea(difficulty, parent)
+  createGameArea(gameManager.getRound(), parent)
   gameManager.startRound()
   messageLabelManager.showLabel(`Ends in ${gameManager.getTimer()} seconds`)
 
@@ -60,13 +59,14 @@ export const finishRound = (parent: Entity) => {
   utils.timers.setTimeout(() => {
     if (!gameManager.isActive()) {
       cleanup()
-      const difficulty = gameManager.getDifficulty()
-      createGameArea(difficulty, parent)
+      createGameArea(gameManager.getRound(), parent)
       return
     }
 
     gameManager.finishRound()
-    if (gameManager.getDifficulty() === Difficulty.VeryHard) {
+    console.log(getRoundCount())
+    console.log(gameManager.getRound())
+    if (gameManager.getRound() === getRoundCount()) {
       messageLabelManager.showLabel(`Game finished!`)
     } else {
       initializeRound(parent)

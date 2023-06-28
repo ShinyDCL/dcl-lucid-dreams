@@ -1,30 +1,30 @@
 import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { sweetDreamsModels } from '../resources'
-import { Difficulty, GameResult, TileColor, TileColorKey, TileSymbol, TileSymbolKey } from './types'
-import { getGameConfiguration } from './gameConfigurations'
+import { sweetDreamModels } from '../resources'
+import { GameResult, TileColor, TileColorKey, TileSymbol, TileSymbolKey } from './types'
+import { getGameConfiguration } from './gameConfiguration'
 
 import { GameArea, Tile } from './components'
 
 const tileModels: { [key in TileColor]: string } = {
-  [TileColor.Yellow]: `${sweetDreamsModels}/tileYellow.glb`,
-  [TileColor.Pink]: `${sweetDreamsModels}/tilePink.glb`,
-  [TileColor.LightBlue]: `${sweetDreamsModels}/tileLightBlue.glb`,
-  [TileColor.DarkBlue]: `${sweetDreamsModels}/tileDarkBlue.glb`,
-  [TileColor.Green]: `${sweetDreamsModels}/tileGreen.glb`,
-  [TileColor.Purple]: `${sweetDreamsModels}/tilePurple.glb`
+  [TileColor.Yellow]: `${sweetDreamModels}/tileYellow.glb`,
+  [TileColor.Pink]: `${sweetDreamModels}/tilePink.glb`,
+  [TileColor.LightBlue]: `${sweetDreamModels}/tileLightBlue.glb`,
+  [TileColor.DarkBlue]: `${sweetDreamModels}/tileDarkBlue.glb`,
+  [TileColor.Green]: `${sweetDreamModels}/tileGreen.glb`,
+  [TileColor.Purple]: `${sweetDreamModels}/tilePurple.glb`
 } as const
 
 const symbolModels: { [key in TileSymbol]: string } = {
-  [TileSymbol.Cloud]: 'models/tileYellow.glb',
-  [TileSymbol.Moon]: 'models/tilePink.glb',
-  [TileSymbol.Star]: 'models/tileLightBlue.glb'
+  [TileSymbol.Triangle]: `${sweetDreamModels}/tileTriangle.glb`,
+  [TileSymbol.Square]: `${sweetDreamModels}/tileSquare.glb`,
+  [TileSymbol.Pentagon]: `${sweetDreamModels}/tilePentagon.glb`
 } as const
 
 const tileSize = 2
 
-export const createGameArea = (difficulty: Difficulty, parent: Entity): GameResult => {
-  const config = getGameConfiguration(difficulty)
+export const createGameArea = (round: number, parent: Entity): GameResult => {
+  const config = getGameConfiguration(round)
   const { size, hasSymbol, targetColorProbability, targetSymbolProbability } = config
 
   const colorKeys = Object.keys(TileColor) as TileColorKey[]
@@ -62,7 +62,9 @@ export const createGameArea = (difficulty: Difficulty, parent: Entity): GameResu
       } else {
         const color = getRandomItem<TileColor>(colorsWithProbabilities)
         const symbol = hasSymbol ? getRandomItem<TileSymbol>(symbolsWithProbabilities) : undefined
-        createTile(i, j, gameAreaEntity, color === targetColor, color, symbol)
+        const isTargetColor = color === targetColor
+        const isTargetSymbol = symbol === targetSymbol
+        createTile(i, j, gameAreaEntity, hasSymbol ? isTargetColor && isTargetSymbol : isTargetColor, color, symbol)
       }
     }
   }
@@ -76,6 +78,15 @@ export const createGameArea = (difficulty: Difficulty, parent: Entity): GameResu
     parent: gameAreaEntity
   })
 
+  if (hasSymbol) {
+    const symbolTile = engine.addEntity()
+    GltfContainer.create(symbolTile, { src: symbolModels[targetSymbol] })
+    Transform.create(symbolTile, {
+      position: Vector3.create(0, 0.2, 0),
+      parent: targetTile
+    })
+  }
+
   return { targetColor, targetSymbol }
 }
 
@@ -85,15 +96,22 @@ export const createTile = (
   parent: Entity,
   isTarget: boolean,
   color: TileColor,
-  _symbol?: TileSymbol
+  symbol?: TileSymbol
 ) => {
   const tile = engine.addEntity()
   GltfContainer.create(tile, { src: tileModels[color] })
   Transform.create(tile, {
     position: Vector3.create(tileSize * i, 0, tileSize * j),
-    parent: parent
+    parent
   })
   Tile.create(tile, { isTarget })
+
+  if (symbol) {
+    const tileSymbol = engine.addEntity()
+    GltfContainer.create(tileSymbol, { src: symbolModels[symbol] })
+    Transform.create(tileSymbol, { position: Vector3.create(0, 0.2, 0), parent: tile })
+    Tile.create(tileSymbol, { isTarget })
+  }
 }
 
 const normalizeProbabilities = <T>(items: { value: T; probability: number }[]): { value: T; probability: number }[] => {

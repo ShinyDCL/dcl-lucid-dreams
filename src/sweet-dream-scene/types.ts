@@ -1,11 +1,3 @@
-export enum Difficulty {
-  VeryEasy = 'Very Easy',
-  Easy = 'Easy',
-  Medium = 'Medium',
-  Hard = 'Hard',
-  VeryHard = 'Very Hard'
-}
-
 export enum TileColor {
   Yellow = 'Yellow',
   Pink = 'Pink',
@@ -16,9 +8,9 @@ export enum TileColor {
 }
 
 export enum TileSymbol {
-  Cloud = 'Cloud',
-  Star = 'Star',
-  Moon = 'Moon'
+  Triangle = 'Triangle',
+  Square = 'Square',
+  Pentagon = 'Pentagon'
 }
 
 export type TileColorKey = keyof typeof TileColor
