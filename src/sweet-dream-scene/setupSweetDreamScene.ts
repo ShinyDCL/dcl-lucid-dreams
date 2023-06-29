@@ -1,10 +1,9 @@
 import { Entity, GltfContainer, InputAction, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { sceneMiddle, sweetDreamModels, yOffset } from '../resources'
+import { sceneMiddle, sweetDreamModels } from '../resources'
 import { SweetDreamsComponent } from './components'
 import { createSkyBox } from '../skyBox'
-import { movePlayerTo } from '~system/RestrictedActions'
-import { initializeGameArea, initializeRound } from './game'
+import { setupGame, startGame } from './game'
 
 export const setupSweetDreamScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
@@ -42,16 +41,11 @@ export const setupSweetDreamScene = (parent: Entity): Entity => {
       entity: startButton,
       opts: { button: InputAction.IA_POINTER, hoverText: 'Start!' }
     },
-    () => {
-      movePlayerTo({ newRelativePosition: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle) })
-      initializeRound(scene)
-    }
+    () => startGame(scene)
   )
   SweetDreamsComponent.create(startButton)
 
-  initializeGameArea(scene)
-
-  movePlayerTo({ newRelativePosition: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle - 14) })
+  setupGame(scene)
 
   return scene
 }

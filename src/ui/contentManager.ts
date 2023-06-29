@@ -1,4 +1,4 @@
-class MessageLabelManager {
+export class ContentManager {
   private visible: boolean = false
   private message: string = ''
 
@@ -10,14 +10,8 @@ class MessageLabelManager {
     this.visible = true
   }
 
-  public updateLabel = (message: string) => {
-    this.message = message
-  }
-
   public hideLabel = () => {
     this.visible = false
     this.message = ''
   }
 }
-
-export const messageLabelManager = new MessageLabelManager()

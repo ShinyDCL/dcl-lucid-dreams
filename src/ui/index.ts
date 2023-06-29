@@ -1,2 +1,3 @@
-export * from './message-label'
 export * from './setupUi'
+export * from './messageLabel'
+export * from './levelInfoLabel'

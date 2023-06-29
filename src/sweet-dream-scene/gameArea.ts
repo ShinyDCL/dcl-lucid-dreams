@@ -1,142 +1,146 @@
 import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { sweetDreamModels } from '../resources'
-import { GameResult, TileColor, TileColorKey, TileSymbol, TileSymbolKey } from './types'
+import { Vector3 } from '@dcl/sdk/math'
 import { getGameConfiguration } from './gameConfiguration'
-
 import { GameArea, Tile } from './components'
+import { TileColor, TileSymbol, colorEnums, createDisplayTile, createGameAreaTile, symbolEnums, tileSize } from './tile'
+import { sweetDreamModels } from '../resources'
 
-const tileModels: { [key in TileColor]: string } = {
-  [TileColor.Yellow]: `${sweetDreamModels}/tileYellow.glb`,
-  [TileColor.Pink]: `${sweetDreamModels}/tilePink.glb`,
-  [TileColor.LightBlue]: `${sweetDreamModels}/tileLightBlue.glb`,
-  [TileColor.DarkBlue]: `${sweetDreamModels}/tileDarkBlue.glb`,
-  [TileColor.Green]: `${sweetDreamModels}/tileGreen.glb`,
-  [TileColor.Purple]: `${sweetDreamModels}/tilePurple.glb`
-} as const
+export interface ItemWithProbability<T> {
+  item: T
+  probability: number
+}
 
-const symbolModels: { [key in TileSymbol]: string } = {
-  [TileSymbol.Triangle]: `${sweetDreamModels}/tileTriangle.glb`,
-  [TileSymbol.Square]: `${sweetDreamModels}/tileSquare.glb`,
-  [TileSymbol.Pentagon]: `${sweetDreamModels}/tilePentagon.glb`
-} as const
-
-const tileSize = 2
-
-export const createGameArea = (round: number, parent: Entity): GameResult => {
+/*
+ * Creates a game area from tiles based on current game round configuration
+ */
+export const createGameArea = (round: number, parent: Entity): Entity => {
+  cleanupGameArea()
   const config = getGameConfiguration(round)
   const { size, hasSymbol, targetColorProbability, targetSymbolProbability } = config
+  const floorSize = tileSize * size
+  const floorMiddle = floorSize / 2 - tileSize / 2
 
-  const colorKeys = Object.keys(TileColor) as TileColorKey[]
-  const targetColorIndex = getRandomInt(colorKeys.length)
-  const targetColor = TileColor[colorKeys[targetColorIndex]]
-  const colorsWithProbabilities = colorKeys.map((key, index) => ({
-    value: TileColor[key],
-    probability: index === targetColorIndex ? targetColorProbability : 1
-  }))
+  const targetCoordinates: [number, number] = [getRandomInt(size - 1), getRandomInt(size - 1)]
 
-  const symbolKeys = Object.keys(TileSymbol) as TileSymbolKey[]
-  const targetSymbolIndex = getRandomInt(symbolKeys.length)
-  const targetSymbol = TileSymbol[symbolKeys[targetSymbolIndex]]
-  const symbolsWithProbabilities = symbolKeys.map((key, index) => ({
-    value: TileSymbol[key],
-    probability: index === targetSymbolIndex ? targetSymbolProbability : 1
-  }))
+  const targetColor = colorEnums[getRandomInt(colorEnums.length - 1)]
+  const colorsWithProbabilities = getItemsWithProbabilities<TileColor>(colorEnums, targetColor, targetColorProbability)
+  console.log(colorsWithProbabilities)
 
-  const targetCoordinates: [number, number] = [getRandomInt(size), getRandomInt(size)]
+  const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length - 1)]
+  const symbolsWithProbabilities = getItemsWithProbabilities<TileSymbol>(
+    symbolEnums,
+    targetSymbol,
+    targetSymbolProbability
+  )
 
-  const floorMiddle = -((tileSize * size) / 2 - tileSize / 2)
-  const gameAreaEntity = engine.addEntity()
-  Transform.create(gameAreaEntity, {
-    position: Vector3.create(floorMiddle, -1, floorMiddle),
-    parent
-  })
-  GameArea.create(gameAreaEntity)
+  const gameArea = engine.addEntity()
+  Transform.create(gameArea, { position: Vector3.create(-floorMiddle, -1, -floorMiddle), parent })
+  GameArea.create(gameArea)
 
   for (let i = 0; i < size; i++) {
     for (let j = 0; j < size; j++) {
       const isTargetTile = i === targetCoordinates[0] && j === targetCoordinates[1]
 
       if (isTargetTile) {
-        createTile(i, j, gameAreaEntity, true, targetColor, hasSymbol ? targetSymbol : undefined)
+        createGameAreaTile(gameArea, config, { i, j }, targetColor, targetSymbol, targetColor, targetSymbol)
       } else {
         const color = getRandomItem<TileColor>(colorsWithProbabilities)
         const symbol = hasSymbol ? getRandomItem<TileSymbol>(symbolsWithProbabilities) : undefined
-        const isTargetColor = color === targetColor
-        const isTargetSymbol = symbol === targetSymbol
-        createTile(i, j, gameAreaEntity, hasSymbol ? isTargetColor && isTargetSymbol : isTargetColor, color, symbol)
+        createGameAreaTile(gameArea, config, { i, j }, targetColor, targetSymbol, color, symbol)
       }
     }
   }
 
-  const targetTile = engine.addEntity()
-  GltfContainer.create(targetTile, { src: tileModels[targetColor] })
-  Transform.create(targetTile, {
-    position: Vector3.create(-floorMiddle, 3, -floorMiddle * 2 + 2),
-    rotation: Quaternion.fromEulerDegrees(-90, 0, 0),
-    scale: Vector3.create(2, 2, 2),
-    parent: gameAreaEntity
-  })
-
-  if (hasSymbol) {
-    const symbolTile = engine.addEntity()
-    GltfContainer.create(symbolTile, { src: symbolModels[targetSymbol] })
-    Transform.create(symbolTile, {
-      position: Vector3.create(0, 0.2, 0),
-      parent: targetTile
-    })
-  }
-
-  return { targetColor, targetSymbol }
+  createDisplayTile(gameArea, config, Vector3.create(floorMiddle, 3, floorSize + 2), targetColor, targetSymbol)
+  addCollider(gameArea, size, floorMiddle)
+  return gameArea
 }
 
-export const createTile = (
-  i: number,
-  j: number,
-  parent: Entity,
-  isTarget: boolean,
-  color: TileColor,
-  symbol?: TileSymbol
-) => {
-  const tile = engine.addEntity()
-  GltfContainer.create(tile, { src: tileModels[color] })
-  Transform.create(tile, {
-    position: Vector3.create(tileSize * i, 0, tileSize * j),
-    parent
-  })
-  Tile.create(tile, { isTarget })
+/*
+ * Assigns probability to each item in the array
+ */
+export const getItemsWithProbabilities = <T>(
+  items: T[],
+  targetItem: T,
+  targetItemProbability: number
+): ItemWithProbability<T>[] => {
+  const itemsWithProbabilities = items.map((item) => ({
+    item,
+    probability: item === targetItem ? targetItemProbability : 1
+  }))
 
-  if (symbol) {
-    const tileSymbol = engine.addEntity()
-    GltfContainer.create(tileSymbol, { src: symbolModels[symbol] })
-    Transform.create(tileSymbol, { position: Vector3.create(0, 0.2, 0), parent: tile })
-    Tile.create(tileSymbol, { isTarget })
-  }
+  return normalizeProbabilities(itemsWithProbabilities)
 }
 
-const normalizeProbabilities = <T>(items: { value: T; probability: number }[]): { value: T; probability: number }[] => {
+/*
+ * Normalizes probabilities so that total sum is 1
+ */
+const normalizeProbabilities = <T>(items: ItemWithProbability<T>[]): ItemWithProbability<T>[] => {
   const totalProbability = items.reduce((sum, item) => sum + item.probability, 0)
-  return items.map(({ value, probability }) => ({
-    value,
+  return items.map(({ item, probability }) => ({
+    item,
     probability: probability / totalProbability
   }))
 }
 
-const getRandomItem = <T>(items: { value: T; probability: number }[]): T => {
-  const normalizedItems = normalizeProbabilities(items)
-
+/*
+ * Gets random item from array based on its probability
+ */
+export const getRandomItem = <T>(items: ItemWithProbability<T>[]): T => {
   const randomValue = Math.random()
   let cumulativeProbability = 0
 
-  for (const item of normalizedItems) {
+  for (const item of items) {
     cumulativeProbability += item.probability
     if (randomValue <= cumulativeProbability) {
-      return item.value
+      return item.item
     }
   }
 
   // Fallback in case of rounding errors or unexpected inputs
-  return normalizedItems[normalizedItems.length - 1].value
+  return items[items.length - 1].item
 }
 
-const getRandomInt = (size: number) => Math.floor(Math.random() * size)
+/*
+ * Returns random Int between 0 and max
+ */
+export const getRandomInt = (max: number) => Math.floor(Math.random() * max + 1)
+
+/*
+ * Adds collider walls to game area based on current round size
+ */
+export const addCollider = (parent: Entity, size: number, floorMiddle: number) => {
+  const gameAreaCollider = engine.addEntity()
+  GltfContainer.create(gameAreaCollider, { src: `${sweetDreamModels}/gameAreaCollider.glb` })
+  Transform.create(gameAreaCollider, {
+    position: Vector3.create(floorMiddle, 0, floorMiddle),
+    scale: Vector3.create(size, 1, size),
+    parent
+  })
+}
+
+/*
+ * Removes non-target tiles from engine
+ */
+export const removeNonTargetTiles = () => {
+  const tiles = engine.getEntitiesWith(Tile)
+  for (const [entity] of tiles) {
+    const tileData = Tile.get(entity)
+    if (!tileData.isTarget) engine.removeEntity(entity)
+  }
+}
+
+/*
+ * Removes tile and game area entities from engine
+ */
+export const cleanupGameArea = () => {
+  const tiles = engine.getEntitiesWith(Tile)
+  for (const [entity] of tiles) {
+    engine.removeEntity(entity)
+  }
+
+  const gameAreas = engine.getEntitiesWith(GameArea)
+  for (const [entity] of gameAreas) {
+    engine.removeEntity(entity)
+  }
+}
