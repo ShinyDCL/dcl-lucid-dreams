@@ -4,4 +4,5 @@ export const sceneSize = parcelCount * parcelSize
 export const sceneMiddle = sceneSize / 2
 export const yOffset = 0.1
 
+export const nightmareModels = 'models/nightmare-scene'
 export const sweetDreamModels = 'models/sweet-dream-scene'
