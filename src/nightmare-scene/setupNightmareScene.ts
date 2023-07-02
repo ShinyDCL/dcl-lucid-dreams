@@ -3,7 +3,7 @@ import { createSkyBox } from '../skyBox'
 import { Vector3 } from '@dcl/sdk/math'
 import { nightmareModels, sceneMiddle, yOffset } from '../resources'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { createLetterSection } from './letterSection'
+import { startGame } from './game'
 
 const gameAreaPosition = Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
 
@@ -20,7 +20,7 @@ export const setupNightmareScene = (parent: Entity): Entity => {
     parent: scene
   })
 
-  createLetterSection(platform)
+  startGame(platform)
 
   movePlayerTo({ newRelativePosition: gameAreaPosition })
 
