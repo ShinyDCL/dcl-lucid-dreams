@@ -3,8 +3,8 @@ import { createSkyBox } from '../skyBox'
 import { Vector3 } from '@dcl/sdk/math'
 import { firstLevel, nightmareModels } from '../resources'
 import { Game } from './game'
-import { LevelComponent } from '../common'
-import { removeLevelComponents } from '../common/removeLevelScene'
+import { LevelComponent, startNextLevel } from '../common'
+import { removeLevelScene } from '../common/removeLevelScene'
 
 export const setupNightmareScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
@@ -33,7 +33,8 @@ export const setupNightmareScene = (parent: Entity): Entity => {
   pointerEventsSystem.onPointerDown(
     { entity: nextLevelButton, opts: { button: InputAction.IA_POINTER, hoverText: `Next level!` } },
     () => {
-      removeLevelComponents(firstLevel)
+      removeLevelScene(firstLevel)
+      startNextLevel(parent)
     }
   )
 

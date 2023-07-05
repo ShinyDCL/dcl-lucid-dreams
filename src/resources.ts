@@ -10,4 +10,4 @@ export const sweetDreamModels = 'models/sweet-dream-scene'
 export const firstLevel = 1
 export const sounds = {
   click: 'sounds/click.mp3'
-}
+} as const
