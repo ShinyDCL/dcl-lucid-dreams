@@ -7,8 +7,15 @@ import { getShuffledWordList } from './wordList'
 import { levelInfoLabelManager, messageLabelManager } from '../ui'
 import { Tile } from './tile'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { Vector3 } from '@dcl/sdk/math'
-import { sceneMiddle, yOffset } from '../resources'
+import { Color4, Vector3 } from '@dcl/sdk/math'
+import { firstLevel, sceneMiddle, yOffset } from '../resources'
+import { LevelComponent } from '../common'
+
+const green: Color4.Mutable = Color4.Green()
+green.a = 0.6
+
+const red: Color4.Mutable = Color4.Red()
+red.a = 0.6
 
 export class Game {
   private readonly maxRoundCount: number = 5
@@ -23,7 +30,8 @@ export class Game {
 
   constructor(parent: Entity) {
     const gameArea = engine.addEntity()
-    Transform.create(gameArea, { parent })
+    Transform.create(gameArea, { position: Vector3.create(0, 0, 4), parent })
+    LevelComponent.create(gameArea, { level: firstLevel })
 
     this.wordList = getShuffledWordList()
     this.letterSection = new LetterSection(gameArea, this.selectLetter)
@@ -44,7 +52,7 @@ export class Game {
     if (!word) return
 
     const lettersInWord = word.split('').map((letter) => letter.toUpperCase())
-    this.wordSection.setWord(lettersInWord)
+    this.wordSection.displayWord(lettersInWord)
 
     const firstLetter = lettersInWord[0]
     const lastLetter = lettersInWord[lettersInWord.length - 1]
@@ -81,26 +89,34 @@ export class Game {
       this.correctGuessCount++
     }
 
+    // If all letters in the word have been revealed then player has won
     if (this.wordSection.allLettersRevealed()) {
       this.letterSection.removeInteractions()
-      messageLabelManager.showLabel('Round won!')
+      messageLabelManager.showLabel('Round won!', green)
 
       utils.timers.setTimeout(() => {
         messageLabelManager.hideLabel()
-        this.round++
-        this.startRound()
-      }, 2000)
+
+        // If the current round is the last round then level has been completed
+        if (this.round >= this.maxRoundCount) {
+          messageLabelManager.showLabel('Level completed! Find button to start next level!', green)
+        } else {
+          this.round++
+          this.startRound()
+        }
+      }, 3000)
     }
 
+    // If maximum count of wrong guesses have been reached then player has lost
     if (this.wrongGuessCount >= this.maxWrongGuessCount) {
       this.letterSection.removeInteractions()
-      messageLabelManager.showLabel('Round lost, try again!')
+      messageLabelManager.showLabel('Round lost, try again!', red)
       this.wordSection.revealWord()
 
       utils.timers.setTimeout(() => {
         messageLabelManager.hideLabel()
         this.startRound()
-      }, 2000)
+      }, 3000)
     }
   }
 }

@@ -1,6 +1,7 @@
 import { Animator, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
-import { nightmareModels } from '../resources'
+import { firstLevel, nightmareModels } from '../resources'
+import { LevelComponent } from '../common'
 
 export enum CharacterPart {
   Top = 'Top',
@@ -34,6 +35,9 @@ export interface CharacterPartWithEntity {
 
 export const animation = 'Animation'
 
+/*
+ * Creates a character from multiple parts which can be made visible by playing animations
+ */
 export class Character {
   private characterParts: CharacterPartWithEntity[]
 
@@ -45,9 +49,11 @@ export class Character {
       rotation: Quaternion.fromEulerDegrees(0, 180, 0),
       parent
     })
+    LevelComponent.create(characterStand, { level: firstLevel })
 
     const character = engine.addEntity()
     Transform.create(character, { parent: characterStand })
+    LevelComponent.create(character, { level: firstLevel })
 
     this.characterParts = characterPartEnums.map((part) => {
       const entity = engine.addEntity()
@@ -64,11 +70,15 @@ export class Character {
       Animator.create(entity, {
         states: [{ name: animation, clip: animation, playing: false, loop: false, shouldReset: true }]
       })
+      LevelComponent.create(entity, { level: firstLevel })
 
       return { part, entity }
     })
   }
 
+  /*
+   * Plays animation for single character part (scales and becomes visible)
+   */
   playAnimation = (partIndex: number) => {
     const part = this.characterParts[partIndex]
     if (!part) return
@@ -79,15 +89,20 @@ export class Character {
     }
   }
 
+  /*
+   * Resets animations for all character parts (scales down and makes invisible)
+   */
   reset = () => {
     this.characterParts.forEach((part) => {
       const clip = Animator.getClipOrNull(part.entity, animation)
       if (clip) {
         clip.playing = false
-        clip.shouldReset
       }
     })
   }
 
+  /*
+   * Gets count of character parts
+   */
   getCharacterPartCount = () => this.characterParts.length
 }

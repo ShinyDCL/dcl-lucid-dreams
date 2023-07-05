@@ -6,3 +6,8 @@ export const yOffset = 0.1
 
 export const nightmareModels = 'models/nightmare-scene'
 export const sweetDreamModels = 'models/sweet-dream-scene'
+
+export const firstLevel = 1
+export const sounds = {
+  click: 'sounds/click.mp3'
+}

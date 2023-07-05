@@ -2,6 +2,7 @@ import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
 import { MessageLabel } from './messageLabel'
 import { LevelInfoLabel } from './levelInfoLabel'
+import { getCurrentGameLevel } from '../common'
 
 export const Root = () => (
   <UiEntity
@@ -29,7 +30,7 @@ export const Root = () => (
         uiBackground={{ color: Color4.create(0, 0, 0, 0.8) }}
       >
         <Label
-          value="Level - 3 (Sweet dream)"
+          value={getCurrentGameLevel()}
           color={Color4.White()}
           fontSize={22}
           font="serif"

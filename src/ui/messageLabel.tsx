@@ -13,11 +13,11 @@ export const MessageLabel = () => (
       margin: { left: 6, right: 6 },
       display: messageLabelManager.isVisible() ? 'flex' : 'none'
     }}
-    uiBackground={{ color: Color4.create(0, 0, 0, 0.8) }}
+    uiBackground={{ color: messageLabelManager.getBackgroundColor() }}
   >
     <Label
       value={messageLabelManager.getMessage()}
-      color={Color4.White()}
+      color={messageLabelManager.getTextColor()}
       fontSize={28}
       font="serif"
       textAlign="middle-center"
