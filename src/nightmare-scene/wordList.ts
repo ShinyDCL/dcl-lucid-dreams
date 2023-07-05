@@ -1,3 +1,5 @@
+import { shuffleArray } from '../common'
+
 const wordList = [
   'Decentralization',
   'Cryptocurrency',
@@ -37,7 +39,6 @@ const wordList = [
   'Public key',
   'Liquidity',
   'Staking',
-  'Transaction fee',
   'Protocol',
   'Interoperability',
   'Zero knowledge',
@@ -46,13 +47,10 @@ const wordList = [
   'Optimistic rollup',
   'Value layer',
   'User experience',
-  'Sidechain'
+  'Sidechain',
+  'Transparency',
+  'Seed phrase',
+  'Mainnet'
 ]
 
 export const getShuffledWordList = (): string[] => shuffleArray([...wordList])
-
-export const shuffleArray = (arr: string[]): string[] =>
-  arr
-    .map((value) => ({ value, sort: Math.random() }))
-    .sort((a, b) => a.sort - b.sort)
-    .map(({ value }) => value)

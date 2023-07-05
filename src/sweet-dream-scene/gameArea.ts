@@ -4,6 +4,7 @@ import { getGameConfiguration } from './gameConfiguration'
 import { GameArea, Tile } from './components'
 import { TileColor, TileSymbol, colorEnums, createDisplayTile, createGameAreaTile, symbolEnums, tileSize } from './tile'
 import { sweetDreamModels } from '../resources'
+import { getRandomInt } from '../common'
 
 export interface ItemWithProbability<T> {
   item: T
@@ -100,11 +101,6 @@ export const getRandomItem = <T>(items: ItemWithProbability<T>[]): T => {
   // Fallback in case of rounding errors or unexpected inputs
   return items[items.length - 1].item
 }
-
-/*
- * Returns random Int between 0 and max
- */
-export const getRandomInt = (max: number) => Math.floor(Math.random() * max + 1)
 
 /*
  * Adds collider walls to game area based on current round size

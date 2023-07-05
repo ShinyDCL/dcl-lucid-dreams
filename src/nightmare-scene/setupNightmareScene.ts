@@ -1,11 +1,8 @@
 import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
 import { createSkyBox } from '../skyBox'
 import { Vector3 } from '@dcl/sdk/math'
-import { nightmareModels, sceneMiddle, yOffset } from '../resources'
-import { movePlayerTo } from '~system/RestrictedActions'
-import { startGame } from './game'
-
-const gameAreaPosition = Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
+import { nightmareModels } from '../resources'
+import { Game } from './game'
 
 export const setupNightmareScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
@@ -20,9 +17,7 @@ export const setupNightmareScene = (parent: Entity): Entity => {
     parent: scene
   })
 
-  startGame(platform)
-
-  movePlayerTo({ newRelativePosition: gameAreaPosition })
+  new Game(platform).startGame()
 
   return scene
 }
