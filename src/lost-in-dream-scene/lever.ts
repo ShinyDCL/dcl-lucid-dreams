@@ -9,8 +9,7 @@ import {
   engine,
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
-import { LevelComponent } from '../common'
-import { sounds, modelFolders, defaultAnimation, levels } from '../resources'
+import { modelFolders, defaultAnimation, LevelComponent, levels, sounds } from '../common'
 
 export class Lever {
   entity: Entity

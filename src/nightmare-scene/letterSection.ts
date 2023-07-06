@@ -1,8 +1,7 @@
 import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
-import { firstLevel, nightmareModels } from '../resources'
 import { Tile, tileSize } from './tile'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
-import { LevelComponent } from '../common'
+import { LevelComponent, levels, modelFolders } from '../common'
 
 const letters = [
   'A',
@@ -45,16 +44,16 @@ export class LetterSection {
   constructor(parent: Entity, onSelectLetter: (tileWithLetter: Tile) => void) {
     const section = engine.addEntity()
     Transform.create(section, { position: Vector3.create(0, 2.2, 0), parent })
-    LevelComponent.create(section, { level: firstLevel })
+    LevelComponent.create(section, { level: levels.first })
 
     const title = engine.addEntity()
     Transform.create(title, { rotation: Quaternion.fromEulerDegrees(0, 180, 0), parent: section })
-    GltfContainer.create(title, { src: `${nightmareModels}/textLetters.glb` })
-    LevelComponent.create(title, { level: firstLevel })
+    GltfContainer.create(title, { src: `${modelFolders.nightmare}/textLetters.glb` })
+    LevelComponent.create(title, { level: levels.first })
 
     const list = engine.addEntity()
     Transform.create(list, { position: Vector3.create(tileSize / 2, -0.4, 0), parent: section })
-    LevelComponent.create(list, { level: firstLevel })
+    LevelComponent.create(list, { level: levels.first })
 
     const letterTiles = letters.map((letter, index) => {
       const row = Math.floor(index / columns) * (spaceSize + tileSize)

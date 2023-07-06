@@ -1,5 +1,5 @@
 import { Transform, engine } from '@dcl/sdk/ecs'
-import { sceneMiddle, yOffset } from './resources'
+import { sceneMiddle, yOffset } from './common'
 import { Vector3 } from '@dcl/sdk/math'
 import { setupUi } from './ui'
 import { setupLostInDreamScene } from './lost-in-dream-scene'
@@ -11,8 +11,8 @@ export function main() {
     position: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
   })
 
-  setupLostInDreamScene(scene)
-  //setupNightmareScene(scene)
+  // setupLostInDreamScene(scene)
+  setupNightmareScene(scene)
   // setupSweetDreamScene(scene)
   setupUi()
 }

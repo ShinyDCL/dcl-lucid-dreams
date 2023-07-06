@@ -1,9 +1,7 @@
 import { Entity, GltfContainer, InputAction, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
-import { createSkyBox } from '../skyBox'
-import { levels, modelFolders, skyBoxFolders } from '../resources'
-import { LevelComponent } from '../common'
 import { Game } from './game'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
+import { LevelComponent, levels, createSkyBox, skyBoxFolders, modelFolders } from '../common'
 
 export const setupLostInDreamScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()

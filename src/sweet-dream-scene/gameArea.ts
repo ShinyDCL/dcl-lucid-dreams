@@ -3,8 +3,7 @@ import { Vector3 } from '@dcl/sdk/math'
 import { getGameConfiguration } from './gameConfiguration'
 import { GameArea, Tile } from './components'
 import { TileColor, TileSymbol, colorEnums, createDisplayTile, createGameAreaTile, symbolEnums, tileSize } from './tile'
-import { sweetDreamModels } from '../resources'
-import { getRandomInt } from '../common'
+import { getRandomInt, modelFolders } from '../common'
 
 export interface ItemWithProbability<T> {
   item: T
@@ -107,7 +106,7 @@ export const getRandomItem = <T>(items: ItemWithProbability<T>[]): T => {
  */
 export const addCollider = (parent: Entity, size: number, floorMiddle: number) => {
   const gameAreaCollider = engine.addEntity()
-  GltfContainer.create(gameAreaCollider, { src: `${sweetDreamModels}/gameAreaCollider.glb` })
+  GltfContainer.create(gameAreaCollider, { src: `${modelFolders.sweetDream}/gameAreaCollider.glb` })
   Transform.create(gameAreaCollider, {
     position: Vector3.create(floorMiddle, 0, floorMiddle),
     scale: Vector3.create(size, 1, size),

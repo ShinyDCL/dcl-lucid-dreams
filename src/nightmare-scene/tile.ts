@@ -10,8 +10,7 @@ import {
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
-import { firstLevel, nightmareModels, sounds } from '../resources'
-import { LevelComponent } from '../common'
+import { LevelComponent, levels, modelFolders, sounds } from '../common'
 
 export const tileSize = 0.4
 const placeholder = '_'
@@ -34,9 +33,9 @@ export class Tile {
     letterHidden?: boolean
   ) {
     const tile = engine.addEntity()
-    GltfContainer.create(tile, { src: `${nightmareModels}/tile.glb` })
+    GltfContainer.create(tile, { src: `${modelFolders.nightmare}/tile.glb` })
     Transform.create(tile, { position, parent })
-    LevelComponent.create(tile, { level: firstLevel })
+    LevelComponent.create(tile, { level: levels.first })
 
     const tileLetter = engine.addEntity(true)
     TextShape.create(tileLetter, {
@@ -49,7 +48,7 @@ export class Tile {
       position: Vector3.create(0, 0, -0.04),
       parent: tile
     })
-    LevelComponent.create(tileLetter, { level: firstLevel })
+    LevelComponent.create(tileLetter, { level: levels.first })
 
     if (onClick) {
       AudioSource.create(tile, {

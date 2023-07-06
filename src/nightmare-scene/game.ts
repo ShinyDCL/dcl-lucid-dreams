@@ -8,8 +8,7 @@ import { levelInfoLabelManager, messageLabelManager } from '../ui'
 import { Tile } from './tile'
 import { movePlayerTo } from '~system/RestrictedActions'
 import { Color4, Vector3 } from '@dcl/sdk/math'
-import { firstLevel, sceneMiddle, yOffset } from '../resources'
-import { LevelComponent } from '../common'
+import { LevelComponent, levels, sceneMiddle, yOffset } from '../common'
 
 const green: Color4.Mutable = Color4.Green()
 green.a = 0.6
@@ -31,7 +30,7 @@ export class Game {
   constructor(parent: Entity) {
     const gameArea = engine.addEntity()
     Transform.create(gameArea, { position: Vector3.create(0, 0, 4), parent })
-    LevelComponent.create(gameArea, { level: firstLevel })
+    LevelComponent.create(gameArea, { level: levels.first })
 
     this.wordList = getShuffledWordList()
     this.letterSection = new LetterSection(gameArea, this.selectLetter)

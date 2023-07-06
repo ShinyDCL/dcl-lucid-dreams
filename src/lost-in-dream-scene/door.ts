@@ -1,6 +1,5 @@
 import { Animator, Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
-import { LevelComponent } from '../common'
-import { defaultAnimation, modelFolders, levels } from '../resources'
+import { modelFolders, defaultAnimation, LevelComponent, levels } from '../common'
 
 export class Door {
   private entity: Entity

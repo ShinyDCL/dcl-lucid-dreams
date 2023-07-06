@@ -4,22 +4,17 @@ export const sceneSize = parcelCount * parcelSize
 export const sceneMiddle = sceneSize / 2
 export const yOffset = 0.1
 
-export const nightmareModels = 'models/nightmare-scene'
-export const sweetDreamModels = 'models/sweet-dream-scene'
-
-export const firstLevel = 1
-
 export const skyBoxFolders = {
-  nightmare: 'models/nightmare-scene',
-  lostInDream: 'lost-in-dream',
-  sweetDream: 'models/nightmare-scene'
-}
+  nightmare: 'nightmare-scene',
+  lostInDream: 'lost-in-dream-scene',
+  sweetDream: 'sweet-dream-scene'
+} as const
 
 export const modelFolders = {
   nightmare: 'models/nightmare-scene',
-  lostInDream: 'models/lost-in-dream',
-  sweetDream: 'models/nightmare-scene'
-}
+  lostInDream: 'models/lost-in-dream-scene',
+  sweetDream: 'models/sweet-dream-scene'
+} as const
 
 export const levels = {
   first: 1,

@@ -1,8 +1,7 @@
 import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
-import { firstLevel, nightmareModels } from '../resources'
 import { Tile, tileSize } from './tile'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { LevelComponent } from '../common'
+import { LevelComponent, levels, modelFolders } from '../common'
 
 const spaceSize = 0.02
 
@@ -16,16 +15,16 @@ export class WordSection {
   constructor(parent: Entity) {
     const section = engine.addEntity()
     Transform.create(section, { position: Vector3.create(0, 3.2, 0), parent })
-    LevelComponent.create(section, { level: firstLevel })
+    LevelComponent.create(section, { level: levels.first })
 
     const title = engine.addEntity()
     Transform.create(title, { rotation: Quaternion.fromEulerDegrees(0, 180, 0), parent: section })
-    GltfContainer.create(title, { src: `${nightmareModels}/textWord.glb` })
-    LevelComponent.create(title, { level: firstLevel })
+    GltfContainer.create(title, { src: `${modelFolders.nightmare}/textWord.glb` })
+    LevelComponent.create(title, { level: levels.first })
 
     const row = engine.addEntity()
     Transform.create(row, { position: Vector3.create(tileSize / 2, -0.4, 0), parent: section })
-    LevelComponent.create(row, { level: firstLevel })
+    LevelComponent.create(row, { level: levels.first })
 
     this.row = row
   }

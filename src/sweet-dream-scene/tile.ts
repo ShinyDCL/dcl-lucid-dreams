@@ -1,7 +1,7 @@
 import { Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { GameConfig } from './gameConfiguration'
-import { sweetDreamModels } from '../resources'
+import { modelFolders } from '../common'
 import { Tile } from './components'
 
 export enum TileColor {
@@ -29,18 +29,18 @@ export const symbolKeys = Object.keys(TileSymbol) as TileSymbolKey[]
 export const symbolEnums: TileSymbol[] = symbolKeys.map((key) => TileSymbol[key])
 
 const tileModels: { [key in TileColor]: string } = {
-  [TileColor.Yellow]: `${sweetDreamModels}/tileYellow.glb`,
-  [TileColor.Pink]: `${sweetDreamModels}/tilePink.glb`,
-  [TileColor.LightBlue]: `${sweetDreamModels}/tileLightBlue.glb`,
-  [TileColor.DarkBlue]: `${sweetDreamModels}/tileDarkBlue.glb`,
-  [TileColor.Green]: `${sweetDreamModels}/tileGreen.glb`,
-  [TileColor.Purple]: `${sweetDreamModels}/tilePurple.glb`
+  [TileColor.Yellow]: `${modelFolders.sweetDream}/tileYellow.glb`,
+  [TileColor.Pink]: `${modelFolders.sweetDream}/tilePink.glb`,
+  [TileColor.LightBlue]: `${modelFolders.sweetDream}/tileLightBlue.glb`,
+  [TileColor.DarkBlue]: `${modelFolders.sweetDream}/tileDarkBlue.glb`,
+  [TileColor.Green]: `${modelFolders.sweetDream}/tileGreen.glb`,
+  [TileColor.Purple]: `${modelFolders.sweetDream}/tilePurple.glb`
 } as const
 
 const symbolModels: { [key in TileSymbol]: string } = {
-  [TileSymbol.Triangle]: `${sweetDreamModels}/tileTriangle.glb`,
-  [TileSymbol.Square]: `${sweetDreamModels}/tileSquare.glb`,
-  [TileSymbol.Pentagon]: `${sweetDreamModels}/tilePentagon.glb`
+  [TileSymbol.Triangle]: `${modelFolders.sweetDream}/tileTriangle.glb`,
+  [TileSymbol.Square]: `${modelFolders.sweetDream}/tileSquare.glb`,
+  [TileSymbol.Pentagon]: `${modelFolders.sweetDream}/tilePentagon.glb`
 } as const
 
 export const tileSize = 2

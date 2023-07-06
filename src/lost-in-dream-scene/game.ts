@@ -1,6 +1,6 @@
 import { Entity } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
-import { sceneMiddle, yOffset } from '../resources'
+import { sceneMiddle, yOffset } from '../common'
 import { leverAndDoorTransforms } from './config'
 import { Door } from './door'
 import { Lever } from './lever'

@@ -1,7 +1,6 @@
 import { Animator, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
-import { firstLevel, nightmareModels } from '../resources'
-import { LevelComponent } from '../common'
+import { LevelComponent, levels, modelFolders } from '../common'
 
 export enum CharacterPart {
   Top = 'Top',
@@ -43,17 +42,17 @@ export class Character {
 
   constructor(parent: Entity) {
     const characterStand = engine.addEntity()
-    GltfContainer.create(characterStand, { src: `${nightmareModels}/stand.glb` })
+    GltfContainer.create(characterStand, { src: `${modelFolders.nightmare}/stand.glb` })
     Transform.create(characterStand, {
       position: Vector3.create(-1.8, 0.2, 0),
       rotation: Quaternion.fromEulerDegrees(0, 180, 0),
       parent
     })
-    LevelComponent.create(characterStand, { level: firstLevel })
+    LevelComponent.create(characterStand, { level: levels.first })
 
     const character = engine.addEntity()
     Transform.create(character, { parent: characterStand })
-    LevelComponent.create(character, { level: firstLevel })
+    LevelComponent.create(character, { level: levels.first })
 
     this.characterParts = characterPartEnums.map((part) => {
       const entity = engine.addEntity()
@@ -66,11 +65,11 @@ export class Character {
       if ([CharacterPart.RightArm, CharacterPart.RightLeg].includes(part))
         transform.rotation = Quaternion.fromEulerDegrees(0, 180, 0)
 
-      GltfContainer.create(entity, { src: `${nightmareModels}/${characterModels[part]}` })
+      GltfContainer.create(entity, { src: `${modelFolders.nightmare}/${characterModels[part]}` })
       Animator.create(entity, {
         states: [{ name: animation, clip: animation, playing: false, loop: false, shouldReset: true }]
       })
-      LevelComponent.create(entity, { level: firstLevel })
+      LevelComponent.create(entity, { level: levels.first })
 
       return { part, entity }
     })
