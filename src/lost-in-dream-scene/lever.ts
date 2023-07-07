@@ -12,7 +12,7 @@ import {
 import { modelFolders, defaultAnimation, LevelComponent, levels, sounds } from '../common'
 
 export class Lever {
-  entity: Entity
+  private entity: Entity
 
   constructor(parent: Entity, transform: Partial<TransformType>) {
     const lever = engine.addEntity()
