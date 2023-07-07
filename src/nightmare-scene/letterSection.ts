@@ -43,7 +43,7 @@ export class LetterSection {
 
   constructor(parent: Entity, onSelectLetter: (tileWithLetter: Tile) => void) {
     const section = engine.addEntity()
-    Transform.create(section, { position: Vector3.create(0, 2.2, 0), parent })
+    Transform.create(section, { position: Vector3.create(0, 2, 0), parent })
     LevelComponent.create(section, { level: levels.first })
 
     const title = engine.addEntity()

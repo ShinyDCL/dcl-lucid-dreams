@@ -1,4 +1,13 @@
-import { Entity, GltfContainer, InputAction, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
+import {
+  Entity,
+  GltfContainer,
+  GltfContainerLoadingState,
+  InputAction,
+  LoadingState,
+  Transform,
+  engine,
+  pointerEventsSystem
+} from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { SweetDreamsComponent } from './components'
 import { setupGame, startGame } from './game'
@@ -44,7 +53,15 @@ export const setupSweetDreamScene = (parent: Entity): Entity => {
   )
   SweetDreamsComponent.create(startButton)
 
-  setupGame(scene)
+  const checkIfLoaded = () => {
+    const loadingState = GltfContainerLoadingState.getOrNull(startPlatform)
+    if (loadingState?.currentState === LoadingState.FINISHED) {
+      setupGame(scene)
+      engine.removeSystem(checkIfLoaded)
+    }
+  }
+
+  engine.addSystem(checkIfLoaded)
 
   return scene
 }

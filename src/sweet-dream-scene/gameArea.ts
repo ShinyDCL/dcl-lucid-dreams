@@ -24,7 +24,6 @@ export const createGameArea = (round: number, parent: Entity): Entity => {
 
   const targetColor = colorEnums[getRandomInt(colorEnums.length - 1)]
   const colorsWithProbabilities = getItemsWithProbabilities<TileColor>(colorEnums, targetColor, targetColorProbability)
-  console.log(colorsWithProbabilities)
 
   const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length - 1)]
   const symbolsWithProbabilities = getItemsWithProbabilities<TileSymbol>(

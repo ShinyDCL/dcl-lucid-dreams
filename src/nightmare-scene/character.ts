@@ -44,7 +44,7 @@ export class Character {
     const characterStand = engine.addEntity()
     GltfContainer.create(characterStand, { src: `${modelFolders.nightmare}/stand.glb` })
     Transform.create(characterStand, {
-      position: Vector3.create(-1.8, 0.2, 0),
+      position: Vector3.create(-1.8, 0, 0),
       rotation: Quaternion.fromEulerDegrees(0, 180, 0),
       parent
     })

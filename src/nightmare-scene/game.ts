@@ -26,8 +26,9 @@ export class Game {
   private wrongGuessCount: number = 0
   private maxWrongGuessCount: number
   private correctGuessCount: number = 0
+  private onGameCompleted: () => void
 
-  constructor(parent: Entity) {
+  constructor(parent: Entity, onGameCompleted: () => void) {
     const gameArea = engine.addEntity()
     Transform.create(gameArea, { position: Vector3.create(0, 0, 4), parent })
     LevelComponent.create(gameArea, { level: levels.first })
@@ -37,6 +38,7 @@ export class Game {
     this.wordSection = new WordSection(gameArea)
     this.character = new Character(gameArea)
     this.maxWrongGuessCount = this.character.getCharacterPartCount()
+    this.onGameCompleted = onGameCompleted
   }
 
   startGame = () => {
@@ -99,6 +101,7 @@ export class Game {
         // If the current round is the last round then level has been completed
         if (this.round >= this.maxRoundCount) {
           messageLabelManager.showLabel('Level completed! Find button to start next level!', green)
+          this.onGameCompleted()
         } else {
           this.round++
           this.startRound()

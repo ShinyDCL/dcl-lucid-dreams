@@ -1,17 +1,18 @@
-import { Entity, GltfContainer, InputAction, Transform, engine, pointerEventsSystem } from '@dcl/sdk/ecs'
+import {
+  Entity,
+  GltfContainer,
+  GltfContainerLoadingState,
+  InputAction,
+  LoadingState,
+  Transform,
+  engine,
+  pointerEventsSystem
+} from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
 import { Game } from './game'
-import {
-  LevelComponent,
-  levels,
-  createSkyBox,
-  skyBoxFolders,
-  modelFolders,
-  removeLevelScene,
-  startNextLevel
-} from '../common'
+import { LevelComponent, levels, createSkyBox, skyBoxFolders, modelFolders } from '../common'
 
-export const setupNightmareScene = (parent: Entity): Entity => {
+export const setupNightmareScene = (parent: Entity, onClickNextLevelButton: () => void): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
   LevelComponent.create(scene, { level: levels.first })
@@ -27,23 +28,31 @@ export const setupNightmareScene = (parent: Entity): Entity => {
   })
   LevelComponent.create(platform, { level: levels.first })
 
+  const checkIfLoaded = () => {
+    const loadingState = GltfContainerLoadingState.getOrNull(platform)
+    if (loadingState?.currentState === LoadingState.FINISHED) {
+      const game = new Game(platform, () => showNextLevelButton(platform, onClickNextLevelButton))
+      game.startGame()
+      engine.removeSystem(checkIfLoaded)
+    }
+  }
+
+  engine.addSystem(checkIfLoaded)
+
+  return scene
+}
+
+const showNextLevelButton = (parent: Entity, onClickNextLevelButton: () => void) => {
   const nextLevelButton = engine.addEntity()
   GltfContainer.create(nextLevelButton, { src: `${modelFolders.nightmare}/nextLevelButton.glb` })
   Transform.create(nextLevelButton, {
     position: Vector3.create(0, 1.5, -5),
-    parent: platform
+    parent
   })
   LevelComponent.create(nextLevelButton, { level: levels.first })
 
   pointerEventsSystem.onPointerDown(
-    { entity: nextLevelButton, opts: { button: InputAction.IA_POINTER, hoverText: `Next level!` } },
-    () => {
-      removeLevelScene(levels.first)
-      startNextLevel(parent)
-    }
+    { entity: nextLevelButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Next level!' } },
+    onClickNextLevelButton
   )
-
-  new Game(platform).startGame()
-
-  return scene
 }

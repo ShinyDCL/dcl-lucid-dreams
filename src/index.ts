@@ -2,8 +2,7 @@ import { Transform, engine } from '@dcl/sdk/ecs'
 import { sceneMiddle, yOffset } from './common'
 import { Vector3 } from '@dcl/sdk/math'
 import { setupUi } from './ui'
-import { setupLostInDreamScene } from './lost-in-dream-scene'
-import { setupNightmareScene } from './nightmare-scene'
+import { levelManager } from './level-manager'
 
 export function main() {
   const scene = engine.addEntity()
@@ -11,8 +10,6 @@ export function main() {
     position: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
   })
 
-  // setupLostInDreamScene(scene)
-  setupNightmareScene(scene)
-  // setupSweetDreamScene(scene)
   setupUi()
+  levelManager.startCurrentLevel(scene)
 }

@@ -14,7 +14,7 @@ export class WordSection {
 
   constructor(parent: Entity) {
     const section = engine.addEntity()
-    Transform.create(section, { position: Vector3.create(0, 3.2, 0), parent })
+    Transform.create(section, { position: Vector3.create(0, 3, 0), parent })
     LevelComponent.create(section, { level: levels.first })
 
     const title = engine.addEntity()

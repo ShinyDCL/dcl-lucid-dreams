@@ -12,6 +12,8 @@ export class Game {
   maxDoors: number
 
   constructor(parent: Entity, onGameCompleted: () => void) {
+    this.maxDoors = leverAndDoorTransforms.length
+
     leverAndDoorTransforms.forEach((transform, index) => {
       const door = new Door(parent, transform.door)
       const lever = new Lever(parent, transform.lever)
@@ -23,8 +25,6 @@ export class Game {
         if (this.doorsOpened === this.maxDoors) onGameCompleted()
       })
     })
-
-    this.maxDoors = leverAndDoorTransforms.length
   }
 
   startGame = () => {
