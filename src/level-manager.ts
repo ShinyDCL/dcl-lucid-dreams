@@ -32,8 +32,8 @@ class LevelManager {
 
   removeLevelScene = (level: number) => {
     for (const [entity] of engine.getEntitiesWith(LevelComponent)) {
-      const levelData = LevelComponent.getOrNull(entity)
-      if (levelData?.level === level) engine.removeEntity(entity)
+      const levelData = LevelComponent.get(entity)
+      if (levelData.level === level) engine.removeEntity(entity)
     }
     messageLabelManager.hideLabel()
   }

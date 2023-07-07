@@ -1,6 +1,7 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { ContentManager } from './contentManager'
+import { colors } from '../common'
 
 export const levelInfoLabelManager = new ContentManager()
 
@@ -13,7 +14,7 @@ export const LevelInfoLabel = () => (
       flexGrow: 1,
       display: levelInfoLabelManager.isVisible() ? 'flex' : 'none'
     }}
-    uiBackground={{ color: Color4.create(0, 0, 0, 0.8) }}
+    uiBackground={{ color: colors.black }}
   >
     <Label
       value={levelInfoLabelManager.getMessage()}
@@ -21,7 +22,6 @@ export const LevelInfoLabel = () => (
       fontSize={22}
       font="serif"
       textAlign="middle-center"
-      uiBackground={{ color: Color4.create(220, 220, 220, 0.3) }}
     />
   </UiEntity>
 )

@@ -39,21 +39,27 @@ const spaceSize = 0.02
  * Letter section with title and a multiple rows of tiles displaying all letters
  */
 export class LetterSection {
+  private section: Entity
+  private title: Entity
+  private list: Entity
   private letterTiles: Tile[]
 
   constructor(parent: Entity, onSelectLetter: (tileWithLetter: Tile) => void) {
     const section = engine.addEntity()
     Transform.create(section, { position: Vector3.create(0, 2, 0), parent })
     LevelComponent.create(section, { level: levels.first })
+    this.section = section
 
     const title = engine.addEntity()
     Transform.create(title, { rotation: Quaternion.fromEulerDegrees(0, 180, 0), parent: section })
     GltfContainer.create(title, { src: `${modelFolders.nightmare}/textLetters.glb` })
     LevelComponent.create(title, { level: levels.first })
+    this.title = title
 
     const list = engine.addEntity()
     Transform.create(list, { position: Vector3.create(tileSize / 2, -0.4, 0), parent: section })
     LevelComponent.create(list, { level: levels.first })
+    this.list = list
 
     const letterTiles = letters.map((letter, index) => {
       const row = Math.floor(index / columns) * (spaceSize + tileSize)
@@ -88,4 +94,11 @@ export class LetterSection {
    * Removes interactions for all letter tiles
    */
   removeInteractions = () => this.letterTiles.forEach((tile) => tile.removeInteraction())
+
+  remove = () => {
+    this.letterTiles.forEach((tile) => tile.removeFromEngine())
+    engine.removeEntity(this.list)
+    engine.removeEntity(this.title)
+    engine.removeEntity(this.section)
+  }
 }

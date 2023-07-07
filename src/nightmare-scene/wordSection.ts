@@ -9,6 +9,8 @@ const spaceSize = 0.02
  * Word section with title and a row of tiles displaying each letter in word
  */
 export class WordSection {
+  private section: Entity
+  private title: Entity
   private row: Entity
   private wordTiles: Tile[] = []
 
@@ -16,11 +18,13 @@ export class WordSection {
     const section = engine.addEntity()
     Transform.create(section, { position: Vector3.create(0, 3, 0), parent })
     LevelComponent.create(section, { level: levels.first })
+    this.section = section
 
     const title = engine.addEntity()
     Transform.create(title, { rotation: Quaternion.fromEulerDegrees(0, 180, 0), parent: section })
     GltfContainer.create(title, { src: `${modelFolders.nightmare}/textWord.glb` })
     LevelComponent.create(title, { level: levels.first })
+    this.title = title
 
     const row = engine.addEntity()
     Transform.create(row, { position: Vector3.create(tileSize / 2, -0.4, 0), parent: section })
@@ -66,4 +70,11 @@ export class WordSection {
    * Checks if word includes given letter
    */
   includesLetter = (letter: string): boolean => !!this.wordTiles.find((tile) => tile.getLetter() === letter)
+
+  remove = () => {
+    this.wordTiles.forEach((tile) => tile.removeFromEngine())
+    engine.removeEntity(this.row)
+    engine.removeEntity(this.title)
+    engine.removeEntity(this.section)
+  }
 }

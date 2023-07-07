@@ -3,6 +3,7 @@ import { Color4 } from '@dcl/sdk/math'
 import { MessageLabel } from './messageLabel'
 import { LevelInfoLabel } from './levelInfoLabel'
 import { levelManager } from '../level-manager'
+import { colors } from '../common'
 
 export const Root = () => (
   <UiEntity
@@ -27,7 +28,7 @@ export const Root = () => (
           height: 30,
           flexGrow: 1
         }}
-        uiBackground={{ color: Color4.create(0, 0, 0, 0.8) }}
+        uiBackground={{ color: colors.black }}
       >
         <Label
           value={levelManager.getCurrentLevel()}

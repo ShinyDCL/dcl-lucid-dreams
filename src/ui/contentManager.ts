@@ -1,9 +1,10 @@
 import { Color4 } from '@dcl/sdk/math'
+import { colors } from '../common'
 
 export class ContentManager {
   private visible: boolean = false
   private message: string = ''
-  private backgroundColor: Color4 = Color4.create(0, 0, 0, 0.8)
+  private backgroundColor: Color4 = colors.black
   private textColor: Color4 = Color4.White()
 
   public isVisible = () => this.visible
@@ -13,7 +14,7 @@ export class ContentManager {
 
   public showLabel = (message: string, backgroundColor?: Color4, textColor?: Color4) => {
     this.message = message
-    this.backgroundColor = backgroundColor || Color4.create(0, 0, 0, 0.8)
+    this.backgroundColor = backgroundColor || colors.black
     this.textColor = textColor || Color4.White()
     this.visible = true
   }

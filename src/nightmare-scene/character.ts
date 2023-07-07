@@ -38,6 +38,8 @@ export const animation = 'Animation'
  * Creates a character from multiple parts which can be made visible by playing animations
  */
 export class Character {
+  private stand: Entity
+  private character: Entity
   private characterParts: CharacterPartWithEntity[]
 
   constructor(parent: Entity) {
@@ -49,10 +51,12 @@ export class Character {
       parent
     })
     LevelComponent.create(characterStand, { level: levels.first })
+    this.stand = characterStand
 
     const character = engine.addEntity()
     Transform.create(character, { parent: characterStand })
     LevelComponent.create(character, { level: levels.first })
+    this.character = character
 
     this.characterParts = characterPartEnums.map((part) => {
       const entity = engine.addEntity()
@@ -104,4 +108,10 @@ export class Character {
    * Gets count of character parts
    */
   getCharacterPartCount = () => this.characterParts.length
+
+  remove = () => {
+    this.characterParts.forEach((part) => engine.removeEntity(part.entity))
+    engine.removeEntity(this.character)
+    engine.removeEntity(this.stand)
+  }
 }

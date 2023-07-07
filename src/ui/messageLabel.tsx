@@ -1,4 +1,3 @@
-import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { ContentManager } from './contentManager'
 

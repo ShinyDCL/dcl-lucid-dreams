@@ -8,7 +8,7 @@ import {
   engine,
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
-import { Vector3 } from '@dcl/sdk/math'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { Game } from './game'
 import { LevelComponent, levels, createSkyBox, skyBoxFolders, modelFolders } from '../common'
 
@@ -46,7 +46,8 @@ const showNextLevelButton = (parent: Entity, onClickNextLevelButton: () => void)
   const nextLevelButton = engine.addEntity()
   GltfContainer.create(nextLevelButton, { src: `${modelFolders.nightmare}/nextLevelButton.glb` })
   Transform.create(nextLevelButton, {
-    position: Vector3.create(0, 1.5, -5),
+    position: Vector3.create(0, 1.5, 3.7),
+    rotation: Quaternion.fromEulerDegrees(0, 180, 0),
     parent
   })
   LevelComponent.create(nextLevelButton, { level: levels.first })

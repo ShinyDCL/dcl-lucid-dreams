@@ -7,25 +7,18 @@ import { getShuffledWordList } from './wordList'
 import { levelInfoLabelManager, messageLabelManager } from '../ui'
 import { Tile } from './tile'
 import { movePlayerTo } from '~system/RestrictedActions'
-import { Color4, Vector3 } from '@dcl/sdk/math'
-import { LevelComponent, levels, sceneMiddle, yOffset } from '../common'
-
-const green: Color4.Mutable = Color4.Green()
-green.a = 0.6
-
-const red: Color4.Mutable = Color4.Red()
-red.a = 0.6
+import { Vector3 } from '@dcl/sdk/math'
+import { LevelComponent, colors, levels, sceneMiddle, yOffset } from '../common'
 
 export class Game {
-  private readonly maxRoundCount: number = 5
-  private round: number = 1
-  private wordList: string[]
+  private readonly maxWordCount: number = 5
+  private wordsGuessed: number = 0
+  private wordList: string[] = []
   private letterSection: LetterSection
   private wordSection: WordSection
   private character: Character
   private wrongGuessCount: number = 0
   private maxWrongGuessCount: number
-  private correctGuessCount: number = 0
   private onGameCompleted: () => void
 
   constructor(parent: Entity, onGameCompleted: () => void) {
@@ -43,20 +36,18 @@ export class Game {
 
   startGame = () => {
     movePlayerTo({ newRelativePosition: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle) })
+    messageLabelManager.showLabel('Successfully guess 5 words to get to the next level! ', colors.black)
     this.startRound(true)
   }
 
   startRound = (skipCleanup?: boolean) => {
     if (!skipCleanup) this.cleanup()
 
-    const word = this.wordList.pop()
-    if (!word) return
+    const word = this.getRandomWord()
+    this.wordSection.displayWord(word)
 
-    const lettersInWord = word.split('').map((letter) => letter.toUpperCase())
-    this.wordSection.displayWord(lettersInWord)
-
-    const firstLetter = lettersInWord[0]
-    const lastLetter = lettersInWord[lettersInWord.length - 1]
+    const firstLetter = word[0]
+    const lastLetter = word[word.length - 1]
 
     // Reveal first and last letter in word
     this.wordSection.revealLetter(firstLetter)
@@ -66,7 +57,7 @@ export class Game {
     this.letterSection.markAsUsed(firstLetter, true)
     this.letterSection.markAsUsed(lastLetter, true)
 
-    levelInfoLabelManager.showLabel(`Round ${this.round}/${this.maxRoundCount}`)
+    levelInfoLabelManager.showLabel(`Words guessed ${this.wordsGuessed}/${this.maxWordCount}`)
   }
 
   cleanup = () => {
@@ -74,7 +65,6 @@ export class Game {
     this.letterSection.reset()
     this.character.reset()
     this.wrongGuessCount = 0
-    this.correctGuessCount = 0
   }
 
   selectLetter = (tile: Tile) => {
@@ -86,24 +76,22 @@ export class Game {
     if (!isCorrectLetter) {
       this.character.playAnimation(this.wrongGuessCount)
       this.wrongGuessCount++
-    } else {
-      this.correctGuessCount++
     }
 
     // If all letters in the word have been revealed then player has won
     if (this.wordSection.allLettersRevealed()) {
+      this.wordsGuessed++
       this.letterSection.removeInteractions()
-      messageLabelManager.showLabel('Round won!', green)
+      messageLabelManager.showLabel('Word completed!', colors.green)
+      levelInfoLabelManager.showLabel(`Words guessed ${this.wordsGuessed}/${this.maxWordCount}`)
 
       utils.timers.setTimeout(() => {
         messageLabelManager.hideLabel()
 
         // If the current round is the last round then level has been completed
-        if (this.round >= this.maxRoundCount) {
-          messageLabelManager.showLabel('Level completed! Find button to start next level!', green)
-          this.onGameCompleted()
+        if (this.wordsGuessed >= this.maxWordCount) {
+          this.completeGame()
         } else {
-          this.round++
           this.startRound()
         }
       }, 3000)
@@ -112,7 +100,7 @@ export class Game {
     // If maximum count of wrong guesses have been reached then player has lost
     if (this.wrongGuessCount >= this.maxWrongGuessCount) {
       this.letterSection.removeInteractions()
-      messageLabelManager.showLabel('Round lost, try again!', red)
+      messageLabelManager.showLabel('You lost, try again!', colors.red)
       this.wordSection.revealWord()
 
       utils.timers.setTimeout(() => {
@@ -120,5 +108,23 @@ export class Game {
         this.startRound()
       }, 3000)
     }
+  }
+
+  getRandomWord = (): string[] => {
+    if (!this.wordList.length) this.wordList = getShuffledWordList()
+
+    const word = this.wordList.pop()
+    if (!word) return []
+
+    return word.split('').map((letter) => letter.toUpperCase())
+  }
+
+  completeGame = () => {
+    this.character.remove()
+    this.wordSection.remove()
+    this.letterSection.remove()
+
+    messageLabelManager.showLabel('Level completed! Click on the button to start next level!', colors.black)
+    this.onGameCompleted()
   }
 }
