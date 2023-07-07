@@ -1,7 +1,7 @@
 {
-  "name": "dcl-project",
+  "name": "dcl-lucid-dreams",
   "version": "1.0.0",
-  "description": "SDK7 Template scene",
+  "description": "Interactive scene created for Game Jam 2023",
   "scripts": {
     "start": "sdk-commands start",
     "deploy": "sdk-commands deploy",

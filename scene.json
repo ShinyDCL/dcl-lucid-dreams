@@ -3,7 +3,7 @@
 	"runtimeVersion": "7",
 	"display": {
 		"title": "Lucid dreams",
-		"description": "Lucid dreams",
+		"description": "Interactive scene created for Game Jam 2023",
 		"navmapThumbnail": "images/scene-thumbnail.png",
 		"favicon": "favicon_asset"
 	},
