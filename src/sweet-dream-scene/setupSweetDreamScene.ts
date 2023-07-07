@@ -10,15 +10,13 @@ import {
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { Game } from './game'
-import { LevelComponent, createSkyBox, levels, modelFolders, skyBoxFolders } from '../common'
+import { createSkyBox, modelFolders, skyBoxFolders } from '../common'
 
 export const setupSweetDreamScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
-  LevelComponent.create(scene, { level: levels.third })
 
-  const skyBox = createSkyBox(parent, skyBoxFolders.sweetDream)
-  LevelComponent.create(skyBox, { level: levels.third })
+  createSkyBox(scene, skyBoxFolders.sweetDream)
 
   const startPlatform = engine.addEntity()
   GltfContainer.create(startPlatform, { src: `${modelFolders.sweetDream}/cloudPlatform.glb` })
@@ -26,7 +24,6 @@ export const setupSweetDreamScene = (parent: Entity): Entity => {
     position: Vector3.create(0, -2.2, -14),
     parent: scene
   })
-  LevelComponent.create(startPlatform, { level: levels.third })
 
   const startButton = engine.addEntity()
   GltfContainer.create(startButton, { src: `${modelFolders.sweetDream}/startButton.glb` })
@@ -46,7 +43,6 @@ export const setupSweetDreamScene = (parent: Entity): Entity => {
         { entity: startButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Start!' } },
         () => game.start()
       )
-      LevelComponent.create(startButton, { level: levels.third })
       engine.removeSystem(checkIfLoaded)
     }
   }

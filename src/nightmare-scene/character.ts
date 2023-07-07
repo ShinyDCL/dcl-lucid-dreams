@@ -1,6 +1,6 @@
-import { Animator, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
+import { Animator, Entity, GltfContainer, Transform, engine, removeEntityWithChildren } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
-import { LevelComponent, levels, modelFolders } from '../common'
+import { modelFolders } from '../common'
 
 export enum CharacterPart {
   Top = 'Top',
@@ -39,7 +39,6 @@ export const animation = 'Animation'
  */
 export class Character {
   private stand: Entity
-  private character: Entity
   private characterParts: CharacterPartWithEntity[]
 
   constructor(parent: Entity) {
@@ -50,13 +49,10 @@ export class Character {
       rotation: Quaternion.fromEulerDegrees(0, 180, 0),
       parent
     })
-    LevelComponent.create(characterStand, { level: levels.first })
     this.stand = characterStand
 
     const character = engine.addEntity()
     Transform.create(character, { parent: characterStand })
-    LevelComponent.create(character, { level: levels.first })
-    this.character = character
 
     this.characterParts = characterPartEnums.map((part) => {
       const entity = engine.addEntity()
@@ -73,7 +69,6 @@ export class Character {
       Animator.create(entity, {
         states: [{ name: animation, clip: animation, playing: false, loop: false, shouldReset: true }]
       })
-      LevelComponent.create(entity, { level: levels.first })
 
       return { part, entity }
     })
@@ -109,9 +104,5 @@ export class Character {
    */
   getCharacterPartCount = () => this.characterParts.length
 
-  remove = () => {
-    this.characterParts.forEach((part) => engine.removeEntity(part.entity))
-    engine.removeEntity(this.character)
-    engine.removeEntity(this.stand)
-  }
+  remove = () => removeEntityWithChildren(engine, this.stand)
 }

@@ -18,12 +18,6 @@ export const modelFolders = {
   sweetDream: 'models/sweet-dream-scene'
 } as const
 
-export const levels = {
-  first: 1,
-  second: 2,
-  third: 3
-} as const
-
 export const sounds = {
   click: 'sounds/click.mp3',
   lever: 'sounds/lever.mp3',

@@ -1,5 +1,4 @@
-import { Entity, engine } from '@dcl/sdk/ecs'
-import { LevelComponent } from './common'
+import { Entity, engine, removeEntityWithChildren } from '@dcl/sdk/ecs'
 import { setupNightmareScene } from './nightmare-scene'
 import { setupSweetDreamScene } from './sweet-dream-scene'
 import { setupLostInDreamScene } from './lost-in-dream-scene'
@@ -14,28 +13,21 @@ class LevelManager {
 
   startCurrentLevel = (parent: Entity) => {
     if (this.currentLevel === 1) {
-      setupNightmareScene(parent, () => this.finishLevel(parent))
+      const sceneParent = setupNightmareScene(parent, () => this.finishLevel(parent, sceneParent))
     }
     if (this.currentLevel === 2) {
-      setupLostInDreamScene(parent, () => this.finishLevel(parent))
+      const sceneParent = setupLostInDreamScene(parent, () => this.finishLevel(parent, sceneParent))
     }
     if (this.currentLevel === 3) {
       setupSweetDreamScene(parent)
     }
   }
 
-  finishLevel = (parent: Entity) => {
-    this.removeLevelScene(this.currentLevel)
+  finishLevel = (parent: Entity, sceneParent: Entity) => {
+    removeEntityWithChildren(engine, sceneParent)
+    messageLabelManager.hideLabel()
     this.currentLevel++
     this.startCurrentLevel(parent)
-  }
-
-  removeLevelScene = (level: number) => {
-    for (const [entity] of engine.getEntitiesWith(LevelComponent)) {
-      const levelData = LevelComponent.get(entity)
-      if (levelData.level === level) engine.removeEntity(entity)
-    }
-    messageLabelManager.hideLabel()
   }
 }
 

@@ -1,6 +1,6 @@
-import { Entity, GltfContainer, Transform, TransformType, VisibilityComponent, engine } from '@dcl/sdk/ecs'
+import { Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
-import { LevelComponent, levels, modelFolders } from '../common'
+import { modelFolders } from '../common'
 
 export enum TileColor {
   Yellow = 'Yellow',
@@ -51,12 +51,10 @@ export class Tile {
   constructor(parent: Entity, transform: Partial<TransformType>) {
     const tile = engine.addEntity()
     Transform.create(tile, { ...transform, parent })
-    LevelComponent.create(tile, { level: levels.third })
     this.tileEntity = tile
 
     const tileSymbol = engine.addEntity()
     Transform.create(tileSymbol, { position: Vector3.create(0, 0.2, 0), parent: tile })
-    LevelComponent.create(tileSymbol, { level: levels.third })
     this.symbolEntity = tileSymbol
   }
 

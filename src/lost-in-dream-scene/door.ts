@@ -1,5 +1,5 @@
 import { Animator, Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
-import { modelFolders, defaultAnimation, LevelComponent, levels } from '../common'
+import { modelFolders, defaultAnimation } from '../common'
 
 export class Door {
   private entity: Entity
@@ -11,7 +11,6 @@ export class Door {
     Animator.create(door, {
       states: [{ name: defaultAnimation, clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
     })
-    LevelComponent.create(door, { level: levels.second })
 
     this.entity = door
   }

@@ -9,7 +9,7 @@ import {
   engine,
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
-import { modelFolders, defaultAnimation, LevelComponent, levels, sounds } from '../common'
+import { modelFolders, defaultAnimation, sounds } from '../common'
 
 export class Lever {
   private entity: Entity
@@ -21,7 +21,6 @@ export class Lever {
     Animator.create(lever, {
       states: [{ name: defaultAnimation, clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
     })
-    LevelComponent.create(lever, { level: levels.second })
 
     AudioSource.create(lever, {
       audioClipUrl: sounds.lever,

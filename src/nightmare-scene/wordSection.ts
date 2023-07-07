@@ -1,7 +1,7 @@
-import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
+import { Entity, GltfContainer, Transform, engine, removeEntityWithChildren } from '@dcl/sdk/ecs'
 import { Tile, tileSize } from './tile'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { LevelComponent, levels, modelFolders } from '../common'
+import { modelFolders } from '../common'
 
 const spaceSize = 0.02
 
@@ -10,25 +10,20 @@ const spaceSize = 0.02
  */
 export class WordSection {
   private section: Entity
-  private title: Entity
   private row: Entity
   private wordTiles: Tile[] = []
 
   constructor(parent: Entity) {
     const section = engine.addEntity()
     Transform.create(section, { position: Vector3.create(0, 3, 0), parent })
-    LevelComponent.create(section, { level: levels.first })
     this.section = section
 
     const title = engine.addEntity()
     Transform.create(title, { rotation: Quaternion.fromEulerDegrees(0, 180, 0), parent: section })
     GltfContainer.create(title, { src: `${modelFolders.nightmare}/textWord.glb` })
-    LevelComponent.create(title, { level: levels.first })
-    this.title = title
 
     const row = engine.addEntity()
     Transform.create(row, { position: Vector3.create(tileSize / 2, -0.4, 0), parent: section })
-    LevelComponent.create(row, { level: levels.first })
 
     this.row = row
   }
@@ -71,10 +66,5 @@ export class WordSection {
    */
   includesLetter = (letter: string): boolean => !!this.wordTiles.find((tile) => tile.getLetter() === letter)
 
-  remove = () => {
-    this.wordTiles.forEach((tile) => tile.removeFromEngine())
-    engine.removeEntity(this.row)
-    engine.removeEntity(this.title)
-    engine.removeEntity(this.section)
-  }
+  remove = () => removeEntityWithChildren(engine, this.section)
 }

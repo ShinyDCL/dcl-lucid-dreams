@@ -2,7 +2,7 @@ import { AudioSource, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { getGameConfiguration } from './gameConfiguration'
 import { Tile, TileColor, TileSymbol, colorEnums, symbolEnums, tileSize } from './tile'
-import { LevelComponent, getRandomInt, levels, modelFolders, sceneMiddle, sceneSize, sounds } from '../common'
+import { getRandomInt, modelFolders, sceneMiddle, sceneSize, sounds } from '../common'
 import { getItemsWithProbabilities, getRandomItem } from './utils'
 import * as utils from '@dcl-sdk/utils'
 
@@ -18,7 +18,6 @@ export class GameArea {
 
     const gameArea = engine.addEntity()
     Transform.create(gameArea, { position: Vector3.create(-floorMiddle, -2.2, -floorMiddle), parent })
-    LevelComponent.create(gameArea, { level: levels.third })
     this.gameAreaEntity = gameArea
 
     AudioSource.create(gameArea, {

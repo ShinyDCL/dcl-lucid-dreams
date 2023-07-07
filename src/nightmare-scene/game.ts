@@ -8,7 +8,7 @@ import { levelInfoLabelManager, messageLabelManager } from '../ui'
 import { Tile } from './tile'
 import { movePlayerTo } from '~system/RestrictedActions'
 import { Vector3 } from '@dcl/sdk/math'
-import { LevelComponent, colors, levels, sceneMiddle, yOffset } from '../common'
+import { colors, sceneMiddle, yOffset } from '../common'
 
 export class Game {
   private readonly maxWordCount: number = 5
@@ -24,7 +24,6 @@ export class Game {
   constructor(parent: Entity, onGameCompleted: () => void) {
     const gameArea = engine.addEntity()
     Transform.create(gameArea, { position: Vector3.create(0, 0, 4), parent })
-    LevelComponent.create(gameArea, { level: levels.first })
 
     this.wordList = getShuffledWordList()
     this.letterSection = new LetterSection(gameArea, this.selectLetter)
