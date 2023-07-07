@@ -26,12 +26,15 @@ export const levels = {
 
 export const sounds = {
   click: 'sounds/click.mp3',
-  lever: 'sounds/lever.mp3'
+  lever: 'sounds/lever.mp3',
+  countdown: 'sounds/countdown.mp3'
 } as const
 
 export const colors = {
-  green: Color4.create(0, 1, 0, 0.4),
-  red: Color4.create(1, 0, 0, 0.4),
+  green: Color4.create(0, 1, 0, 0.6),
+  red: Color4.create(1, 0, 0, 0.6),
+  blue: Color4.create(0, 0, 1, 0.7),
+  pink: Color4.create(1, 0, 1, 0.7),
   black: Color4.create(0, 0, 0, 0.8)
 } as const
 

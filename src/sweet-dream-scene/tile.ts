@@ -1,8 +1,6 @@
-import { Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { GameConfig } from './gameConfiguration'
-import { modelFolders } from '../common'
-import { Tile } from './components'
+import { Entity, GltfContainer, Transform, TransformType, VisibilityComponent, engine } from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
+import { LevelComponent, levels, modelFolders } from '../common'
 
 export enum TileColor {
   Yellow = 'Yellow',
@@ -45,71 +43,36 @@ const symbolModels: { [key in TileSymbol]: string } = {
 
 export const tileSize = 2
 
-/*
- * Creates a single tile for game area
- */
-export const createGameAreaTile = (
-  parent: Entity,
-  gameConfig: GameConfig,
-  coordinates: { i: number; j: number },
-  targetColor: TileColor,
-  targetSymbol: TileSymbol,
-  color: TileColor,
-  symbol?: TileSymbol
-) => {
-  const isTargetColor = color === targetColor
-  const isTargetSymbol = symbol === targetSymbol
-  const isTarget = gameConfig.hasSymbol ? isTargetColor && isTargetSymbol : isTargetColor
+export class Tile {
+  private target: boolean = false
+  private tileEntity: Entity
+  private symbolEntity: Entity
 
-  const transform = { position: Vector3.create(coordinates.i * tileSize, 0, coordinates.j * tileSize), parent }
-  createTile(gameConfig, transform, isTarget, color, symbol)
-}
+  constructor(parent: Entity, transform: Partial<TransformType>) {
+    const tile = engine.addEntity()
+    Transform.create(tile, { ...transform, parent })
+    LevelComponent.create(tile, { level: levels.third })
+    this.tileEntity = tile
 
-/*
- * Creates a tile displaying target color and symbol at the front of game area
- */
-export const createDisplayTile = (
-  parent: Entity,
-  gameConfig: GameConfig,
-  position: Vector3.MutableVector3,
-  color: TileColor,
-  symbol?: TileSymbol
-) => {
-  const transform = {
-    position,
-    rotation: Quaternion.fromEulerDegrees(-90, 0, 0),
-    scale: Vector3.create(2, 2, 2),
-    parent
+    const tileSymbol = engine.addEntity()
+    Transform.create(tileSymbol, { position: Vector3.create(0, 0.2, 0), parent: tile })
+    LevelComponent.create(tileSymbol, { level: levels.third })
+    this.symbolEntity = tileSymbol
   }
-  createTile(gameConfig, transform, true, color, symbol)
-}
 
-/*
- * Creates a tile
- */
-export const createTile = (
-  { hasSymbol }: GameConfig,
-  transform: Partial<TransformType>,
-  isTarget: boolean,
-  color: TileColor,
-  symbol?: TileSymbol
-) => {
-  const tile = engine.addEntity()
-  GltfContainer.create(tile, { src: tileModels[color] })
-  Transform.create(tile, transform)
-  Tile.create(tile, { isTarget })
+  isTarget = () => this.target
 
-  if (hasSymbol && symbol) {
-    createTileSymbol(tile, symbol, isTarget)
+  updateTile = (target: boolean, color: TileColor, symbol?: TileSymbol) => {
+    this.target = target
+    GltfContainer.createOrReplace(this.tileEntity, { src: tileModels[color] })
+
+    if (symbol) {
+      GltfContainer.createOrReplace(this.symbolEntity, { src: symbolModels[symbol] })
+    }
   }
-}
 
-/*
- * Creates a symbol for a tile
- */
-export const createTileSymbol = (parent: Entity, symbol: TileSymbol, isTarget: boolean) => {
-  const tileSymbol = engine.addEntity()
-  GltfContainer.create(tileSymbol, { src: symbolModels[symbol] })
-  Transform.create(tileSymbol, { position: Vector3.create(0, 0.2, 0), parent })
-  Tile.create(tileSymbol, { isTarget })
+  hideTile = () => {
+    GltfContainer.deleteFrom(this.symbolEntity)
+    GltfContainer.deleteFrom(this.tileEntity)
+  }
 }

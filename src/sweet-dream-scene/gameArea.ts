@@ -1,140 +1,159 @@
-import { Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
-import { Vector3 } from '@dcl/sdk/math'
+import { AudioSource, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import { getGameConfiguration } from './gameConfiguration'
-import { GameArea, Tile } from './components'
-import { TileColor, TileSymbol, colorEnums, createDisplayTile, createGameAreaTile, symbolEnums, tileSize } from './tile'
-import { getRandomInt, modelFolders } from '../common'
+import { Tile, TileColor, TileSymbol, colorEnums, symbolEnums, tileSize } from './tile'
+import { LevelComponent, getRandomInt, levels, modelFolders, sceneMiddle, sceneSize, sounds } from '../common'
+import { getItemsWithProbabilities, getRandomItem } from './utils'
+import * as utils from '@dcl-sdk/utils'
 
-export interface ItemWithProbability<T> {
-  item: T
-  probability: number
-}
+export class GameArea {
+  private gameAreaEntity: Entity
+  private displayTile: Tile
+  private tiles: Tile[][]
+  private floorCollider: Entity
 
-/*
- * Creates a game area from tiles based on current game round configuration
- */
-export const createGameArea = (round: number, parent: Entity): Entity => {
-  cleanupGameArea()
-  const config = getGameConfiguration(round)
-  const { size, hasSymbol, targetColorProbability, targetSymbolProbability } = config
-  const floorSize = tileSize * size
-  const floorMiddle = floorSize / 2 - tileSize / 2
+  constructor(parent: Entity, size: number, onTriggerEnter: () => void) {
+    const floorSize = tileSize * size
+    const floorMiddle = floorSize / 2 - tileSize / 2
 
-  const targetCoordinates: [number, number] = [getRandomInt(size - 1), getRandomInt(size - 1)]
+    const gameArea = engine.addEntity()
+    Transform.create(gameArea, { position: Vector3.create(-floorMiddle, -2.2, -floorMiddle), parent })
+    LevelComponent.create(gameArea, { level: levels.third })
+    this.gameAreaEntity = gameArea
 
-  const targetColor = colorEnums[getRandomInt(colorEnums.length - 1)]
-  const colorsWithProbabilities = getItemsWithProbabilities<TileColor>(colorEnums, targetColor, targetColorProbability)
+    AudioSource.create(gameArea, {
+      audioClipUrl: sounds.countdown,
+      loop: true,
+      playing: false
+    })
 
-  const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length - 1)]
-  const symbolsWithProbabilities = getItemsWithProbabilities<TileSymbol>(
-    symbolEnums,
-    targetSymbol,
-    targetSymbolProbability
-  )
+    this.floorCollider = this.addFloorCollider(gameArea, size, floorMiddle)
+    this.addWallCollider(gameArea, size, floorMiddle)
+    this.addTriggerLayer(onTriggerEnter)
 
-  const gameArea = engine.addEntity()
-  Transform.create(gameArea, { position: Vector3.create(-floorMiddle, -1, -floorMiddle), parent })
-  GameArea.create(gameArea)
-
-  for (let i = 0; i < size; i++) {
-    for (let j = 0; j < size; j++) {
-      const isTargetTile = i === targetCoordinates[0] && j === targetCoordinates[1]
-
-      if (isTargetTile) {
-        createGameAreaTile(gameArea, config, { i, j }, targetColor, targetSymbol, targetColor, targetSymbol)
-      } else {
-        const color = getRandomItem<TileColor>(colorsWithProbabilities)
-        const symbol = hasSymbol ? getRandomItem<TileSymbol>(symbolsWithProbabilities) : undefined
-        createGameAreaTile(gameArea, config, { i, j }, targetColor, targetSymbol, color, symbol)
+    this.tiles = []
+    for (let i = 0; i < size; i++) {
+      this.tiles[i] = []
+      for (let j = 0; j < size; j++) {
+        this.tiles[i][j] = new Tile(gameArea, { position: Vector3.create(i * tileSize, 0, j * tileSize) })
       }
     }
+
+    this.displayTile = new Tile(gameArea, {
+      position: Vector3.create(floorMiddle, 3, floorSize + 2),
+      rotation: Quaternion.fromEulerDegrees(-90, 0, 0),
+      scale: Vector3.create(2, 2, 2)
+    })
   }
 
-  createDisplayTile(gameArea, config, Vector3.create(floorMiddle, 3, floorSize + 2), targetColor, targetSymbol)
-  addCollider(gameArea, size, floorMiddle)
-  return gameArea
-}
+  /*
+   * Updates game area from tiles based on current round configuration
+   */
+  update = (round: number) => {
+    const config = getGameConfiguration(round)
+    const { hasSymbol, targetColorProbability, targetSymbolProbability } = config
 
-/*
- * Assigns probability to each item in the array
- */
-export const getItemsWithProbabilities = <T>(
-  items: T[],
-  targetItem: T,
-  targetItemProbability: number
-): ItemWithProbability<T>[] => {
-  const itemsWithProbabilities = items.map((item) => ({
-    item,
-    probability: item === targetItem ? targetItemProbability : 1
-  }))
+    const targetColor = colorEnums[getRandomInt(colorEnums.length - 1)]
+    const colorsWithProbabilities = getItemsWithProbabilities<TileColor>(
+      colorEnums,
+      targetColor,
+      targetColorProbability
+    )
 
-  return normalizeProbabilities(itemsWithProbabilities)
-}
+    const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length - 1)]
+    const symbolsWithProbabilities = getItemsWithProbabilities<TileSymbol>(
+      symbolEnums,
+      targetSymbol,
+      targetSymbolProbability
+    )
 
-/*
- * Normalizes probabilities so that total sum is 1
- */
-const normalizeProbabilities = <T>(items: ItemWithProbability<T>[]): ItemWithProbability<T>[] => {
-  const totalProbability = items.reduce((sum, item) => sum + item.probability, 0)
-  return items.map(({ item, probability }) => ({
-    item,
-    probability: probability / totalProbability
-  }))
-}
+    const targetCoords: [number, number] = [getRandomInt(this.tiles.length - 1), getRandomInt(this.tiles.length - 1)]
 
-/*
- * Gets random item from array based on its probability
- */
-export const getRandomItem = <T>(items: ItemWithProbability<T>[]): T => {
-  const randomValue = Math.random()
-  let cumulativeProbability = 0
+    this.tiles.forEach((row, i) => {
+      row.forEach((tile, j) => {
+        if (targetCoords[0] === i && targetCoords[0] === j) {
+          tile.updateTile(true, targetColor, hasSymbol ? targetSymbol : undefined)
+        } else {
+          const color = getRandomItem<TileColor>(colorsWithProbabilities)
+          const symbol = hasSymbol ? getRandomItem<TileSymbol>(symbolsWithProbabilities) : undefined
+          const isTargetTile = color === targetColor && (!hasSymbol || symbol === targetSymbol)
+          tile.updateTile(isTargetTile, color, symbol)
+        }
+      })
+    })
 
-  for (const item of items) {
-    cumulativeProbability += item.probability
-    if (randomValue <= cumulativeProbability) {
-      return item.item
-    }
+    this.displayTile.updateTile(true, targetColor, hasSymbol ? targetSymbol : undefined)
+  }
+  /*
+   * Adds collider walls to game area based on current game size
+   */
+  addWallCollider = (parent: Entity, size: number, floorMiddle: number) => {
+    const wallCollider = engine.addEntity()
+    GltfContainer.create(wallCollider, { src: `${modelFolders.sweetDream}/gameAreaCollider.glb` })
+    Transform.create(wallCollider, {
+      position: Vector3.create(floorMiddle, 0, floorMiddle),
+      scale: Vector3.create(size, 1, size),
+      parent
+    })
   }
 
-  // Fallback in case of rounding errors or unexpected inputs
-  return items[items.length - 1].item
-}
-
-/*
- * Adds collider walls to game area based on current round size
- */
-export const addCollider = (parent: Entity, size: number, floorMiddle: number) => {
-  const gameAreaCollider = engine.addEntity()
-  GltfContainer.create(gameAreaCollider, { src: `${modelFolders.sweetDream}/gameAreaCollider.glb` })
-  Transform.create(gameAreaCollider, {
-    position: Vector3.create(floorMiddle, 0, floorMiddle),
-    scale: Vector3.create(size, 1, size),
-    parent
-  })
-}
-
-/*
- * Removes non-target tiles from engine
- */
-export const removeNonTargetTiles = () => {
-  const tiles = engine.getEntitiesWith(Tile)
-  for (const [entity] of tiles) {
-    const tileData = Tile.get(entity)
-    if (!tileData.isTarget) engine.removeEntity(entity)
-  }
-}
-
-/*
- * Removes tile and game area entities from engine
- */
-export const cleanupGameArea = () => {
-  const tiles = engine.getEntitiesWith(Tile)
-  for (const [entity] of tiles) {
-    engine.removeEntity(entity)
+  /*
+   * Adds collider floor to game area based on current game size
+   */
+  addFloorCollider = (parent: Entity, size: number, floorMiddle: number): Entity => {
+    const floorCollider = engine.addEntity()
+    GltfContainer.create(floorCollider, { src: `${modelFolders.sweetDream}/gameAreaFloorCollider.glb` })
+    Transform.create(floorCollider, {
+      position: Vector3.create(floorMiddle, 0, floorMiddle),
+      scale: Vector3.create(size, 1, size),
+      parent
+    })
+    return floorCollider
   }
 
-  const gameAreas = engine.getEntitiesWith(GameArea)
-  for (const [entity] of gameAreas) {
-    engine.removeEntity(entity)
+  hideFloorCollider = () => GltfContainer.deleteFrom(this.floorCollider)
+
+  showFloorCollider = (): Entity => {
+    GltfContainer.createOrReplace(this.floorCollider, { src: `${modelFolders.sweetDream}/gameAreaFloorCollider.glb` })
+    return this.floorCollider
+  }
+
+  /*
+   * Removes non-target tiles from engine
+   */
+  hideNonTargetTiles = () => {
+    this.tiles.forEach((row) => {
+      row.forEach((tile) => !tile.isTarget() && tile.hideTile())
+    })
+  }
+
+  addTriggerLayer = (onTriggerEnter: () => void) => {
+    // Create a box with disabled collision
+    const triggerEntity = engine.addEntity()
+    Transform.create(triggerEntity)
+
+    utils.triggers.addTrigger(
+      triggerEntity,
+      utils.NO_LAYERS,
+      utils.LAYER_1,
+      [
+        {
+          type: 'box',
+          position: { x: sceneMiddle, y: sceneMiddle / 2 - 4, z: sceneMiddle },
+          scale: { x: sceneSize, y: sceneMiddle, z: sceneSize }
+        }
+      ],
+      onTriggerEnter
+    )
+  }
+
+  playAudio = () => {
+    const audioSource = AudioSource.getMutable(this.gameAreaEntity)
+    if (audioSource) audioSource.playing = true
+  }
+
+  stopAudio = () => {
+    const audioSource = AudioSource.getMutable(this.gameAreaEntity)
+    if (audioSource) audioSource.playing = false
   }
 }

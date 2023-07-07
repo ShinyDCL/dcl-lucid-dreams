@@ -9,54 +9,44 @@ import {
   pointerEventsSystem
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { SweetDreamsComponent } from './components'
-import { setupGame, startGame } from './game'
-import { createSkyBox, modelFolders, sceneMiddle, skyBoxFolders } from '../common'
+import { Game } from './game'
+import { LevelComponent, createSkyBox, levels, modelFolders, skyBoxFolders } from '../common'
 
 export const setupSweetDreamScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
-  SweetDreamsComponent.create(scene)
+  LevelComponent.create(scene, { level: levels.third })
 
   const skyBox = createSkyBox(parent, skyBoxFolders.sweetDream)
-  SweetDreamsComponent.create(skyBox)
+  LevelComponent.create(skyBox, { level: levels.third })
 
   const startPlatform = engine.addEntity()
   GltfContainer.create(startPlatform, { src: `${modelFolders.sweetDream}/cloudPlatform.glb` })
   Transform.create(startPlatform, {
-    position: Vector3.create(0, -1, -14),
+    position: Vector3.create(0, -2.2, -14),
     parent: scene
   })
-  SweetDreamsComponent.create(startPlatform)
-
-  const stars = engine.addEntity()
-  GltfContainer.create(stars, { src: `${modelFolders.sweetDream}/stars.glb` })
-  Transform.create(stars, {
-    position: Vector3.create(0, sceneMiddle, 0),
-    parent: scene
-  })
-  SweetDreamsComponent.create(stars)
+  LevelComponent.create(startPlatform, { level: levels.third })
 
   const startButton = engine.addEntity()
   GltfContainer.create(startButton, { src: `${modelFolders.sweetDream}/startButton.glb` })
   Transform.create(startButton, {
-    position: Vector3.create(0, 0.5, -12),
+    position: Vector3.create(0, -0.8, -12),
     rotation: Quaternion.fromEulerDegrees(0, 180, 0),
     parent: scene
   })
-  pointerEventsSystem.onPointerDown(
-    {
-      entity: startButton,
-      opts: { button: InputAction.IA_POINTER, hoverText: 'Start!' }
-    },
-    () => startGame(scene)
-  )
-  SweetDreamsComponent.create(startButton)
 
   const checkIfLoaded = () => {
     const loadingState = GltfContainerLoadingState.getOrNull(startPlatform)
     if (loadingState?.currentState === LoadingState.FINISHED) {
-      setupGame(scene)
+      const game = new Game(scene)
+      game.initialize()
+
+      pointerEventsSystem.onPointerDown(
+        { entity: startButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Start!' } },
+        () => game.start()
+      )
+      LevelComponent.create(startButton, { level: levels.third })
       engine.removeSystem(checkIfLoaded)
     }
   }
