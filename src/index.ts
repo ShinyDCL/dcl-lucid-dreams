@@ -3,6 +3,7 @@ import { sceneMiddle, yOffset } from './common'
 import { Vector3 } from '@dcl/sdk/math'
 import { setupUi } from './ui'
 import { levelManager } from './level-manager'
+import { setupMusic } from './setupMusic'
 
 export function main() {
   const scene = engine.addEntity()
@@ -11,5 +12,6 @@ export function main() {
   })
 
   setupUi()
+  setupMusic()
   levelManager.startCurrentLevel(scene)
 }

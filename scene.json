@@ -52,7 +52,11 @@
 		}
 	],
 	"requiredPermissions": [
-		"ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE"
+		"ALLOW_TO_MOVE_PLAYER_INSIDE_SCENE",
+		"ALLOW_MEDIA_HOSTNAMES"
+	],
+	"allowedMediaHostnames": [
+		"icecast.ravepartyradio.org"
 	],
 	"featureToggles": {},
 	"worldConfiguration": {

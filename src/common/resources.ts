@@ -33,3 +33,5 @@ export const colors = {
 } as const
 
 export const defaultAnimation = 'Animation'
+
+export const audioStreamUrl = 'https://icecast.ravepartyradio.org/ravepartyradio-192.mp3'
