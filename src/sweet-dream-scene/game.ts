@@ -97,9 +97,10 @@ export class Game {
     if (this.gameActive && this.roundActive) {
       this.roundActive = false
       this.gameActive = false
-      messageLabelManager.showLabel('Round lost!', colors.red)
+      const message = 'Round lost!'
+      messageLabelManager.showLabel(message, colors.red)
       utils.timers.setTimeout(() => {
-        messageLabelManager.hideLabel()
+        if (messageLabelManager.getMessage() === message) messageLabelManager.hideLabel()
       }, 3000)
       this.initialize()
     } else {
