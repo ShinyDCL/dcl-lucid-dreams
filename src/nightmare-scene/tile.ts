@@ -37,7 +37,7 @@ export class Tile {
     GltfContainer.create(tile, { src: `${modelFolders.nightmare}/tile.glb` })
     Transform.create(tile, { position, parent })
 
-    const tileLetter = engine.addEntity(true)
+    const tileLetter = engine.addEntity()
     TextShape.create(tileLetter, {
       text: letterHidden ? placeholder : letter,
       fontSize: 3,
