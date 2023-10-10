@@ -1,22 +1,12 @@
-import {
-  Entity,
-  GltfContainer,
-  GltfContainerLoadingState,
-  InputAction,
-  LoadingState,
-  Transform,
-  engine,
-  pointerEventsSystem
-} from '@dcl/sdk/ecs'
-import { Game } from './game'
+import { engine, Entity, GltfContainer, GltfContainerLoadingState, LoadingState, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { createSkyBox, skyBoxFolders, modelFolders } from '../common'
 
-export const setupLostInDreamScene = (parent: Entity, onClickNextLevelButton: () => void): Entity => {
+import { addInteraction, modelFolders } from '../common'
+import { Game } from './game'
+
+export const setUpLostInDreamScene = (parent: Entity, onClickNextLevelButton: () => void): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
-
-  createSkyBox(scene, skyBoxFolders.lostInDream)
 
   const maze = engine.addEntity()
   Transform.create(maze, { position: Vector3.create(0, -2, 0), parent: scene })
@@ -45,8 +35,5 @@ const showNextLevelButton = (parent: Entity, onClickNextLevelButton: () => void)
     parent
   })
 
-  pointerEventsSystem.onPointerDown(
-    { entity: nextLevelButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Next level!' } },
-    onClickNextLevelButton
-  )
+  addInteraction(nextLevelButton, 'Next level!', onClickNextLevelButton)
 }

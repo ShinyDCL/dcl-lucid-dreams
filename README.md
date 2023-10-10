@@ -25,7 +25,7 @@ User needs to complete 10 rounds of reaction game by stepping on the tile with c
 
 #### Blockade Labs Skybox AI Tool
 
-Skybox for each level generated using [Blockade Labs Skybox AI Tool](https://skybox.blockadelabs.com/)
+Skybox for each level generated using [Blockade Labs Skybox AI Tool](https://skybox.blockadelabs.com/) licensed under the [CC BY 4.0 license](https://creativecommons.org/licenses/by/4.0/)
 
 - First level [skybox](https://skybox.blockadelabs.com/c969b36096aa7556ec4c58293257422e)
   ![Level 1 - Skybox](screenshots/skybox-level1.png)
@@ -58,6 +58,23 @@ Advice and code fragments from my colleague [ChatGPT](https://chat.openai.com/)
 
 - Helping me come up with words for 'Hangman' game
   ![ChatGPT words](screenshots/chat-gpt-words.png)
+
+## Try it out
+
+1. Download this repository.
+
+2. Install the [Decentraland Editor](https://docs.decentraland.org/creator/development-guide/sdk7/editor/)
+
+3. Open a Visual Studio Code window on this scene's root folder. Not on the root folder of the whole repo, but instead on this sub-folder that belongs to the scene.
+
+4. Open the Decentraland Editor tab, and press **Run Scene**
+
+Alternatively, you can use the command line. Inside this scene root directory run:
+
+```
+npm i
+npm run start
+```
 
 ## Copyright info
 

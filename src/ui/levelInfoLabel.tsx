@@ -1,7 +1,8 @@
 import { Color4 } from '@dcl/sdk/math'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
-import { ContentManager } from './contentManager'
+
 import { colors } from '../common'
+import { ContentManager } from './contentManager'
 
 export const levelInfoLabelManager = new ContentManager()
 

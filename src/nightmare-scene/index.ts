@@ -1,1 +1,1 @@
-export * from './setupNightmareScene'
+export * from './setUpNightmareScene'

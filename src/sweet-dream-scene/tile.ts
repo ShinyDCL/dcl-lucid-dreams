@@ -1,5 +1,6 @@
-import { Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
+import { engine, Entity, GltfContainer, Transform, TransformType } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
+
 import { modelFolders } from '../common'
 
 export enum TileColor {
@@ -26,7 +27,7 @@ export const colorEnums: TileColor[] = colorKeys.map((key) => TileColor[key])
 export const symbolKeys = Object.keys(TileSymbol) as TileSymbolKey[]
 export const symbolEnums: TileSymbol[] = symbolKeys.map((key) => TileSymbol[key])
 
-const tileModels: { [key in TileColor]: string } = {
+const tileModels: Record<TileColor, string> = {
   [TileColor.Yellow]: `${modelFolders.sweetDream}/tileYellow.glb`,
   [TileColor.Pink]: `${modelFolders.sweetDream}/tilePink.glb`,
   [TileColor.LightBlue]: `${modelFolders.sweetDream}/tileLightBlue.glb`,
@@ -35,7 +36,7 @@ const tileModels: { [key in TileColor]: string } = {
   [TileColor.Purple]: `${modelFolders.sweetDream}/tilePurple.glb`
 } as const
 
-const symbolModels: { [key in TileSymbol]: string } = {
+const symbolModels: Record<TileSymbol, string> = {
   [TileSymbol.Triangle]: `${modelFolders.sweetDream}/tileTriangle.glb`,
   [TileSymbol.Square]: `${modelFolders.sweetDream}/tileSquare.glb`,
   [TileSymbol.Pentagon]: `${modelFolders.sweetDream}/tilePentagon.glb`

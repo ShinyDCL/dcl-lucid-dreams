@@ -1,9 +1,10 @@
-import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { Color4 } from '@dcl/sdk/math'
-import { MessageLabel } from './messageLabel'
-import { LevelInfoLabel } from './levelInfoLabel'
-import { levelManager } from '../level-manager'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
+
 import { colors } from '../common'
+import { levelManager } from '../levelManager'
+import { LevelInfoLabel } from './levelInfoLabel'
+import { MessageLabel } from './messageLabel'
 
 export const Root = () => (
   <UiEntity

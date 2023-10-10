@@ -1,4 +1,5 @@
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
+
 import { ContentManager } from './contentManager'
 
 export const messageLabelManager = new ContentManager()

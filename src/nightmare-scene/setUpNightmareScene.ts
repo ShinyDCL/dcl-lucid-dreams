@@ -1,22 +1,12 @@
-import {
-  Entity,
-  GltfContainer,
-  GltfContainerLoadingState,
-  InputAction,
-  LoadingState,
-  Transform,
-  engine,
-  pointerEventsSystem
-} from '@dcl/sdk/ecs'
+import { engine, Entity, GltfContainer, GltfContainerLoadingState, LoadingState, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { Game } from './game'
-import { createSkyBox, skyBoxFolders, modelFolders } from '../common'
 
-export const setupNightmareScene = (parent: Entity, onClickNextLevelButton: () => void): Entity => {
+import { addInteraction, modelFolders } from '../common'
+import { Game } from './game'
+
+export const setUpNightmareScene = (parent: Entity, onClickNextLevelButton: () => void): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
-
-  createSkyBox(scene, skyBoxFolders.nightmare)
 
   const platform = engine.addEntity()
   GltfContainer.create(platform, { src: `${modelFolders.nightmare}/platform.glb` })
@@ -48,8 +38,5 @@ const showNextLevelButton = (parent: Entity, onClickNextLevelButton: () => void)
     parent
   })
 
-  pointerEventsSystem.onPointerDown(
-    { entity: nextLevelButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Next level!' } },
-    onClickNextLevelButton
-  )
+  addInteraction(nextLevelButton, 'Next level!', onClickNextLevelButton)
 }

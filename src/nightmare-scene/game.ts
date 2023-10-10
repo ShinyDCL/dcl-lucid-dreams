@@ -1,14 +1,16 @@
-import { Entity, Transform, engine } from '@dcl/sdk/ecs'
-import * as utils from '@dcl-sdk/utils'
-import { WordSection } from './wordSection'
-import { LetterSection } from './letterSection'
-import { Character } from './character'
-import { getShuffledWordList } from './wordList'
-import { levelInfoLabelManager, messageLabelManager } from '../ui'
-import { Tile } from './tile'
 import { movePlayerTo } from '~system/RestrictedActions'
+
+import * as utils from '@dcl-sdk/utils'
+import { engine, Entity, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
+
 import { colors, sceneMiddle, yOffset } from '../common'
+import { levelInfoLabelManager, messageLabelManager } from '../ui'
+import { Character } from './character'
+import { LetterSection } from './letterSection'
+import { Tile } from './tile'
+import { getShuffledWordList } from './wordList'
+import { WordSection } from './wordSection'
 
 export class Game {
   private readonly maxWordCount: number = 5
@@ -73,7 +75,7 @@ export class Game {
     this.letterSection.markAsUsed(selectedLetter, isCorrectLetter)
     this.wordSection.revealLetter(selectedLetter)
     if (!isCorrectLetter) {
-      this.character.playAnimation(this.wrongGuessCount)
+      this.character.showPart(this.wrongGuessCount)
       this.wrongGuessCount++
     }
 
@@ -99,8 +101,8 @@ export class Game {
     // If maximum count of wrong guesses have been reached then player has lost
     if (this.wrongGuessCount >= this.maxWrongGuessCount) {
       this.letterSection.removeInteractions()
-      messageLabelManager.showLabel('You lost, try again!', colors.red)
       this.wordSection.revealWord()
+      messageLabelManager.showLabel('You lost, try again!', colors.red)
 
       utils.timers.setTimeout(() => {
         messageLabelManager.hideLabel()

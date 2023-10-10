@@ -1,7 +1,8 @@
-import { Entity, GltfContainer, Transform, engine, removeEntityWithChildren } from '@dcl/sdk/ecs'
-import { Tile, tileSize } from './tile'
+import { engine, Entity, GltfContainer, Transform } from '@dcl/sdk/ecs'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
+
 import { modelFolders } from '../common'
+import { Tile, tileSize } from './tile'
 
 const letters = [
   'A',
@@ -69,7 +70,7 @@ export class LetterSection {
   reset = () =>
     this.letterTiles.forEach((tile) => {
       tile.setTextColor(Color4.White())
-      tile.addInteraction()
+      tile.addOnClick()
     })
 
   /*
@@ -88,5 +89,5 @@ export class LetterSection {
    */
   removeInteractions = () => this.letterTiles.forEach((tile) => tile.removeInteraction())
 
-  remove = () => removeEntityWithChildren(engine, this.section)
+  remove = () => engine.removeEntityWithChildren(this.section)
 }

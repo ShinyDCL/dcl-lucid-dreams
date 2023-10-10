@@ -48,13 +48,13 @@ const gameConfiguration: GameConfig[] = [
   },
   {
     hasSymbol: true,
-    targetColorProbability: 10,
-    targetSymbolProbability: 0.05
+    targetColorProbability: 20,
+    targetSymbolProbability: 0.02
   },
   {
     hasSymbol: true,
-    targetColorProbability: 20,
-    targetSymbolProbability: 0.05
+    targetColorProbability: 40,
+    targetSymbolProbability: 0.01
   }
 ]
 

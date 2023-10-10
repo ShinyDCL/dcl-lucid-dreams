@@ -1,1 +1,1 @@
-export * from './setupLostInDreamScene'
+export * from './setUpLostInDreamScene'

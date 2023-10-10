@@ -1,14 +1,22 @@
-import { Entity } from '@dcl/sdk/ecs'
-import * as utils from '@dcl-sdk/utils'
-import { GameArea } from './gameArea'
-import { Vector3 } from '@dcl/sdk/math'
-import { colors, sceneMiddle, yOffset } from '../common'
-import { movePlayerTo } from '~system/RestrictedActions'
-import { getRoundCount } from './gameConfiguration'
-import { levelInfoLabelManager, messageLabelManager } from '../ui'
+import { movePlayerTo, MovePlayerToRequest } from '~system/RestrictedActions'
 
-const startPlatformPosition = Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle - 14)
-const gameAreaPosition = Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
+import * as utils from '@dcl-sdk/utils'
+import { Entity } from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
+
+import { colors, sceneMiddle, yOffset } from '../common'
+import { levelInfoLabelManager, messageLabelManager } from '../ui'
+import { GameArea } from './gameArea'
+import { getRoundCount } from './gameConfiguration'
+
+const startPlatformPosition: MovePlayerToRequest = {
+  newRelativePosition: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle - 14),
+  cameraTarget: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle - 10)
+}
+
+const gameAreaPosition: MovePlayerToRequest = {
+  newRelativePosition: Vector3.create(sceneMiddle, sceneMiddle + yOffset, sceneMiddle)
+}
 
 export class Game {
   private readonly roundPreparationTime = 3
@@ -27,15 +35,13 @@ export class Game {
 
   initialize = () => {
     levelInfoLabelManager.showLabel(`Completed rounds ${this.round}/${getRoundCount()}`)
-    movePlayerTo({ newRelativePosition: startPlatformPosition })
+    movePlayerTo(startPlatformPosition)
   }
 
   start = () => {
     this.gameActive = true
-    this.gameArea.update(this.round)
-
     this.initializeRound()
-    movePlayerTo({ newRelativePosition: gameAreaPosition })
+    movePlayerTo(gameAreaPosition)
   }
 
   initializeRound = () => {
@@ -58,14 +64,14 @@ export class Game {
     this.roundActive = true
     this.timer = this.roundTime
     this.gameArea.update(this.round)
-    this.gameArea.playAudio()
+    this.gameArea.playCountdownSound()
     messageLabelManager.showLabel(`Ends in ${this.timer} seconds`, colors.blue)
 
     const timerId = utils.timers.setInterval(() => {
       if (this.timer <= 1) {
         utils.timers.clearInterval(timerId)
         messageLabelManager.hideLabel()
-        this.gameArea.stopAudio()
+        this.gameArea.stopCountdownSound()
         this.finishRound()
       } else {
         this.timer--
@@ -97,14 +103,13 @@ export class Game {
     if (this.gameActive && this.roundActive) {
       this.roundActive = false
       this.gameActive = false
+      this.gameArea.showFloorCollider()
       const message = 'Round lost!'
       messageLabelManager.showLabel(message, colors.red)
       utils.timers.setTimeout(() => {
         if (messageLabelManager.getMessage() === message) messageLabelManager.hideLabel()
       }, 3000)
-      this.initialize()
-    } else {
-      movePlayerTo({ newRelativePosition: startPlatformPosition })
     }
+    movePlayerTo(startPlatformPosition)
   }
 }

@@ -1,4 +1,4 @@
-import { Vector3, Quaternion } from '@dcl/sdk/math'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
 export const leverAndDoorTransforms = [
   {

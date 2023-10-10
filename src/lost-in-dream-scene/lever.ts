@@ -1,15 +1,6 @@
-import {
-  Animator,
-  AudioSource,
-  Entity,
-  GltfContainer,
-  InputAction,
-  Transform,
-  TransformType,
-  engine,
-  pointerEventsSystem
-} from '@dcl/sdk/ecs'
-import { modelFolders, defaultAnimation, sounds } from '../common'
+import { Animator, AudioSource, engine, Entity, GltfContainer, Transform, TransformType } from '@dcl/sdk/ecs'
+
+import { addInteraction, defaultAnimation, modelFolders, playAnimation, playSound, sounds } from '../common'
 
 export class Lever {
   private entity: Entity
@@ -19,7 +10,7 @@ export class Lever {
     GltfContainer.create(lever, { src: `${modelFolders.lostInDream}/lever.glb` })
     Transform.create(lever, { parent, ...transform })
     Animator.create(lever, {
-      states: [{ name: defaultAnimation, clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
+      states: [{ clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
     })
 
     AudioSource.create(lever, {
@@ -31,25 +22,10 @@ export class Lever {
     this.entity = lever
   }
 
-  setOnClick = (hoverText: string, onClick: () => void) => {
-    pointerEventsSystem.onPointerDown(
-      { entity: this.entity, opts: { button: InputAction.IA_POINTER, hoverText } },
-      () => {
-        pointerEventsSystem.removeOnPointerDown(this.entity)
-        this.playAudio()
-        this.playAnimation()
-        onClick()
-      }
-    )
-  }
-
-  playAudio = () => {
-    const audioSource = AudioSource.getMutableOrNull(this.entity)
-    if (audioSource) audioSource.playing = true
-  }
-
-  playAnimation = () => {
-    const clip = Animator.getClipOrNull(this.entity, defaultAnimation)
-    if (clip) clip.playing = true
-  }
+  addOnClick = (hoverText: string, onClick: () => void) =>
+    addInteraction(this.entity, hoverText, () => {
+      playSound(this.entity)
+      playAnimation(this.entity)
+      onClick()
+    })
 }

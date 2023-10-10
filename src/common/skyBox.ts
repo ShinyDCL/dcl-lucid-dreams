@@ -1,14 +1,15 @@
-import { Entity, engine, Transform, MeshRenderer, Material } from '@dcl/sdk/ecs'
-import { Vector3, Quaternion } from '@dcl/sdk/math'
+import { engine, Entity, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
+
 import { sceneSize } from './resources'
 
 export const createSkyBox = (parent: Entity, folderName: string): Entity => {
   const folderPath = `images/skybox/${folderName}`
   const defaultScale = Vector3.create(sceneSize, sceneSize, sceneSize)
   const skyBoxRoot = engine.addEntity()
-  Transform.create(skyBoxRoot, { parent })
+  Transform.create(skyBoxRoot, { parent, scale: Vector3.create(0, 0, 0) })
 
-  //front
+  // Front
   const skyBoxPZ = engine.addEntity()
   Transform.create(skyBoxPZ, {
     position: Vector3.create(0, 0, sceneSize / 2),
@@ -18,7 +19,7 @@ export const createSkyBox = (parent: Entity, folderName: string): Entity => {
   MeshRenderer.setPlane(skyBoxPZ)
   Material.setBasicMaterial(skyBoxPZ, { texture: Material.Texture.Common({ src: `${folderPath}/pz.jpg` }) })
 
-  //back
+  // Back
   const skyBoxNZ = engine.addEntity()
   Transform.create(skyBoxNZ, {
     position: Vector3.create(0, 0, -sceneSize / 2),
@@ -29,7 +30,7 @@ export const createSkyBox = (parent: Entity, folderName: string): Entity => {
   MeshRenderer.setPlane(skyBoxNZ)
   Material.setBasicMaterial(skyBoxNZ, { texture: Material.Texture.Common({ src: `${folderPath}/nz.jpg` }) })
 
-  //Top
+  // Top
   const skyBoxPY = engine.addEntity()
   Transform.create(skyBoxPY, {
     position: Vector3.create(0, sceneSize / 2, 0),
@@ -40,7 +41,7 @@ export const createSkyBox = (parent: Entity, folderName: string): Entity => {
   MeshRenderer.setPlane(skyBoxPY)
   Material.setBasicMaterial(skyBoxPY, { texture: Material.Texture.Common({ src: `${folderPath}/py.jpg` }) })
 
-  //Bottom
+  // Bottom
   const skyBoxNY = engine.addEntity()
   Transform.create(skyBoxNY, {
     position: Vector3.create(0, -sceneSize / 2, 0),
@@ -51,7 +52,7 @@ export const createSkyBox = (parent: Entity, folderName: string): Entity => {
   MeshRenderer.setPlane(skyBoxNY)
   Material.setBasicMaterial(skyBoxNY, { texture: Material.Texture.Common({ src: `${folderPath}/ny.jpg` }) })
 
-  //Right
+  // Right
   const skyBoxPX = engine.addEntity()
   Transform.create(skyBoxPX, {
     position: Vector3.create(sceneSize / 2, 0, 0),

@@ -1,22 +1,12 @@
-import {
-  Entity,
-  GltfContainer,
-  GltfContainerLoadingState,
-  InputAction,
-  LoadingState,
-  Transform,
-  engine,
-  pointerEventsSystem
-} from '@dcl/sdk/ecs'
+import { engine, Entity, GltfContainer, GltfContainerLoadingState, LoadingState, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { Game } from './game'
-import { createSkyBox, modelFolders, skyBoxFolders } from '../common'
 
-export const setupSweetDreamScene = (parent: Entity): Entity => {
+import { addInteraction, modelFolders } from '../common'
+import { Game } from './game'
+
+export const setUpSweetDreamScene = (parent: Entity): Entity => {
   const scene = engine.addEntity()
   Transform.create(scene, { parent })
-
-  createSkyBox(scene, skyBoxFolders.sweetDream)
 
   const startPlatform = engine.addEntity()
   GltfContainer.create(startPlatform, { src: `${modelFolders.sweetDream}/cloudPlatform.glb` })
@@ -39,10 +29,7 @@ export const setupSweetDreamScene = (parent: Entity): Entity => {
       const game = new Game(scene)
       game.initialize()
 
-      pointerEventsSystem.onPointerDown(
-        { entity: startButton, opts: { button: InputAction.IA_POINTER, hoverText: 'Start!' } },
-        () => game.start()
-      )
+      addInteraction(startButton, 'Start!', game.start)
       engine.removeSystem(checkIfLoaded)
     }
   }

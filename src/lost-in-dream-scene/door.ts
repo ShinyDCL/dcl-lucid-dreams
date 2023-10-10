@@ -1,5 +1,6 @@
-import { Animator, Entity, GltfContainer, Transform, TransformType, engine } from '@dcl/sdk/ecs'
-import { modelFolders, defaultAnimation } from '../common'
+import { Animator, engine, Entity, GltfContainer, Transform, TransformType } from '@dcl/sdk/ecs'
+
+import { defaultAnimation, modelFolders, playAnimation } from '../common'
 
 export class Door {
   private entity: Entity
@@ -9,14 +10,11 @@ export class Door {
     GltfContainer.create(door, { src: `${modelFolders.lostInDream}/door.glb` })
     Transform.create(door, { parent, ...transform })
     Animator.create(door, {
-      states: [{ name: defaultAnimation, clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
+      states: [{ clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
     })
 
     this.entity = door
   }
 
-  playAnimation = () => {
-    const clip = Animator.getClipOrNull(this.entity, defaultAnimation)
-    if (clip) clip.playing = true
-  }
+  open = () => playAnimation(this.entity)
 }

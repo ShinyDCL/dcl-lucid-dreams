@@ -1,4 +1,5 @@
 import { Color4 } from '@dcl/sdk/math'
+
 import { colors } from '../common'
 
 export class ContentManager {

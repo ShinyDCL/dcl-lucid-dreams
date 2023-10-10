@@ -1,6 +1,7 @@
-import { Animator, Entity, GltfContainer, Transform, engine, removeEntityWithChildren } from '@dcl/sdk/ecs'
-import { Vector3, Quaternion } from '@dcl/sdk/math'
-import { modelFolders } from '../common'
+import { Animator, engine, Entity, GltfContainer, Transform } from '@dcl/sdk/ecs'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
+
+import { defaultAnimation, hideEntity, modelFolders, playAnimation, showEntity, stopAnimation } from '../common'
 
 export enum CharacterPart {
   Top = 'Top',
@@ -17,7 +18,7 @@ export type CharacterPartKey = keyof typeof CharacterPart
 export const characterPartKeys = Object.keys(CharacterPart) as CharacterPartKey[]
 export const characterPartEnums: CharacterPart[] = characterPartKeys.map((key) => CharacterPart[key])
 
-export const characterModels: { [key in CharacterPart]: string } = {
+export const characterModels: Record<CharacterPart, string> = {
   [CharacterPart.Top]: 'characterTop.glb',
   [CharacterPart.Head]: 'characterHead.glb',
   [CharacterPart.Body]: 'characterBody.glb',
@@ -31,8 +32,6 @@ export interface CharacterPartWithEntity {
   part: CharacterPart
   entity: Entity
 }
-
-export const animation = 'Animation'
 
 /*
  * Creates a character from multiple parts which can be made visible by playing animations
@@ -67,7 +66,7 @@ export class Character {
 
       GltfContainer.create(entity, { src: `${modelFolders.nightmare}/${characterModels[part]}` })
       Animator.create(entity, {
-        states: [{ name: animation, clip: animation, playing: false, loop: false, shouldReset: true }]
+        states: [{ clip: defaultAnimation, playing: false, loop: false, shouldReset: true }]
       })
 
       return { part, entity }
@@ -77,32 +76,27 @@ export class Character {
   /*
    * Plays animation for single character part (scales and becomes visible)
    */
-  playAnimation = (partIndex: number) => {
+  showPart = (partIndex: number) => {
     const part = this.characterParts[partIndex]
     if (!part) return
 
-    const clip = Animator.getClipOrNull(part.entity, animation)
-    if (clip) {
-      clip.playing = true
-    }
+    showEntity(part.entity)
+    playAnimation(part.entity)
   }
 
   /*
    * Resets animations for all character parts (scales down and makes invisible)
    */
-  reset = () => {
+  reset = () =>
     this.characterParts.forEach((part) => {
-      const clip = Animator.getClipOrNull(part.entity, animation)
-      if (clip) {
-        clip.playing = false
-      }
+      stopAnimation(part.entity)
+      hideEntity(part.entity)
     })
-  }
 
   /*
    * Gets count of character parts
    */
   getCharacterPartCount = () => this.characterParts.length
 
-  remove = () => removeEntityWithChildren(engine, this.stand)
+  remove = () => engine.removeEntityWithChildren(this.stand)
 }

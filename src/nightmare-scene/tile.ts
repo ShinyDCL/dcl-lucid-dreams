@@ -1,17 +1,16 @@
 import {
   AudioSource,
+  engine,
   Entity,
   Font,
   GltfContainer,
-  InputAction,
-  TextShape,
-  Transform,
-  engine,
   pointerEventsSystem,
-  removeEntityWithChildren
+  TextShape,
+  Transform
 } from '@dcl/sdk/ecs'
 import { Color4, Vector3 } from '@dcl/sdk/math'
-import { modelFolders, sounds } from '../common'
+
+import { addInteraction, modelFolders, playSound, sounds } from '../common'
 
 export const tileSize = 0.4
 const placeholder = '_'
@@ -49,6 +48,11 @@ export class Tile {
       parent: tile
     })
 
+    this.tileEntity = tile
+    this.letterEntity = tileLetter
+    this.letter = letter
+    this.letterHidden = letterHidden
+
     if (onClick) {
       AudioSource.create(tile, {
         audioClipUrl: sounds.click,
@@ -56,20 +60,9 @@ export class Tile {
         playing: false
       })
 
-      pointerEventsSystem.onPointerDown(
-        { entity: tile, opts: { button: InputAction.IA_POINTER, hoverText: `Select ${letter}!` } },
-        () => {
-          this.playSound()
-          onClick(this)
-        }
-      )
       this.onClick = onClick
+      this.addOnClick()
     }
-
-    this.letter = letter
-    this.letterEntity = tileLetter
-    this.tileEntity = tile
-    this.letterHidden = letterHidden
   }
 
   getLetter = () => this.letter
@@ -79,10 +72,8 @@ export class Tile {
    * Sets text color for the letter displayed on tile
    */
   setTextColor = (color: Color4) => {
-    const textShape = TextShape.getMutableOrNull(this.letterEntity)
-    if (textShape) {
-      textShape.textColor = color
-    }
+    const textShape = TextShape.getMutable(this.letterEntity)
+    textShape.textColor = color
   }
 
   /*
@@ -93,35 +84,24 @@ export class Tile {
   /*
    * Adds on-click interaction to tile
    */
-  addInteraction = () =>
-    pointerEventsSystem.onPointerDown(
-      { entity: this.tileEntity, opts: { button: InputAction.IA_POINTER, hoverText: `Select ${this.letter}!` } },
-      () => {
-        if (!this.onClick) return
-
-        this.playSound()
-        this.onClick(this)
-      }
-    )
+  addOnClick = () =>
+    addInteraction(this.tileEntity, `Select ${this.letter}!`, () => {
+      if (!this.onClick) return
+      playSound(this.tileEntity)
+      this.onClick(this)
+    })
 
   /*
    * Shows tile letter
    */
   showLetter = () => {
     this.letterHidden = false
-    const textShape = TextShape.getMutableOrNull(this.letterEntity)
-    if (textShape) {
-      textShape.text = this.letter
-    }
+    const textShape = TextShape.getMutable(this.letterEntity)
+    textShape.text = this.letter
   }
 
   /*
    * Removes tile from engine by removing tile and letter entities
    */
-  removeFromEngine = () => removeEntityWithChildren(engine, this.tileEntity)
-
-  playSound = () => {
-    const audioSource = AudioSource.getMutable(this.tileEntity)
-    if (audioSource) audioSource.playing = true
-  }
+  removeFromEngine = () => engine.removeEntityWithChildren(this.tileEntity)
 }

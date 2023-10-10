@@ -1,16 +1,18 @@
-import { AudioSource, Entity, GltfContainer, Transform, engine } from '@dcl/sdk/ecs'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { getGameConfiguration } from './gameConfiguration'
-import { Tile, TileColor, TileSymbol, colorEnums, symbolEnums, tileSize } from './tile'
-import { getRandomInt, modelFolders, sceneMiddle, sceneSize, sounds } from '../common'
-import { getItemsWithProbabilities, getRandomItem } from './utils'
 import * as utils from '@dcl-sdk/utils'
+import { AudioSource, engine, Entity, GltfContainer, MeshCollider, Transform } from '@dcl/sdk/ecs'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
+
+import { getRandomInt, modelFolders, playSound, sceneMiddle, sceneSize, sounds, stopSound } from '../common'
+import { getGameConfiguration } from './gameConfiguration'
+import { colorEnums, symbolEnums, Tile, TileColor, tileSize, TileSymbol } from './tile'
+import { getItemsWithProbabilities, getRandomItem } from './utils'
 
 export class GameArea {
   private gameAreaEntity: Entity
   private displayTile: Tile
   private tiles: Tile[][]
   private floorCollider: Entity
+  private size: number
 
   constructor(parent: Entity, size: number, onTriggerEnter: () => void) {
     const floorSize = tileSize * size
@@ -30,6 +32,7 @@ export class GameArea {
     this.addWallCollider(gameArea, size, floorMiddle)
     this.addTriggerLayer(onTriggerEnter)
 
+    // Game area from n x n tiles
     this.tiles = []
     for (let i = 0; i < size; i++) {
       this.tiles[i] = []
@@ -38,11 +41,14 @@ export class GameArea {
       }
     }
 
+    // Tile displaying target color (and symbol) in front of game area
     this.displayTile = new Tile(gameArea, {
       position: Vector3.create(floorMiddle, 3, floorSize + 2),
       rotation: Quaternion.fromEulerDegrees(-90, 0, 0),
       scale: Vector3.create(2, 2, 2)
     })
+
+    this.size = size
   }
 
   /*
@@ -52,21 +58,21 @@ export class GameArea {
     const config = getGameConfiguration(round)
     const { hasSymbol, targetColorProbability, targetSymbolProbability } = config
 
-    const targetColor = colorEnums[getRandomInt(colorEnums.length - 1)]
+    const targetColor = colorEnums[getRandomInt(colorEnums.length)]
     const colorsWithProbabilities = getItemsWithProbabilities<TileColor>(
       colorEnums,
       targetColor,
       targetColorProbability
     )
 
-    const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length - 1)]
+    const targetSymbol = symbolEnums[getRandomInt(symbolEnums.length)]
     const symbolsWithProbabilities = getItemsWithProbabilities<TileSymbol>(
       symbolEnums,
       targetSymbol,
       targetSymbolProbability
     )
 
-    const targetCoords: [number, number] = [getRandomInt(this.tiles.length - 1), getRandomInt(this.tiles.length - 1)]
+    const targetCoords: [number, number] = [getRandomInt(this.tiles.length), getRandomInt(this.tiles.length)]
 
     this.tiles.forEach((row, i) => {
       row.forEach((tile, j) => {
@@ -101,21 +107,18 @@ export class GameArea {
    */
   addFloorCollider = (parent: Entity, size: number, floorMiddle: number): Entity => {
     const floorCollider = engine.addEntity()
-    GltfContainer.create(floorCollider, { src: `${modelFolders.sweetDream}/gameAreaFloorCollider.glb` })
+    MeshCollider.setPlane(floorCollider)
     Transform.create(floorCollider, {
-      position: Vector3.create(floorMiddle, 0, floorMiddle),
-      scale: Vector3.create(size, 1, size),
+      position: Vector3.create(floorMiddle, 0.192, floorMiddle),
+      rotation: Quaternion.fromEulerDegrees(90, 0, 0),
+      scale: Vector3.create(size * tileSize, size * tileSize, 1),
       parent
     })
     return floorCollider
   }
 
-  hideFloorCollider = () => GltfContainer.deleteFrom(this.floorCollider)
-
-  showFloorCollider = (): Entity => {
-    GltfContainer.createOrReplace(this.floorCollider, { src: `${modelFolders.sweetDream}/gameAreaFloorCollider.glb` })
-    return this.floorCollider
-  }
+  hideFloorCollider = () => MeshCollider.deleteFrom(this.floorCollider)
+  showFloorCollider = () => MeshCollider.setPlane(this.floorCollider)
 
   /*
    * Removes non-target tiles from engine
@@ -146,13 +149,6 @@ export class GameArea {
     )
   }
 
-  playAudio = () => {
-    const audioSource = AudioSource.getMutable(this.gameAreaEntity)
-    if (audioSource) audioSource.playing = true
-  }
-
-  stopAudio = () => {
-    const audioSource = AudioSource.getMutable(this.gameAreaEntity)
-    if (audioSource) audioSource.playing = false
-  }
+  playCountdownSound = () => playSound(this.gameAreaEntity)
+  stopCountdownSound = () => stopSound(this.gameAreaEntity)
 }
