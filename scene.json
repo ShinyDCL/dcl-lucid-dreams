@@ -13,7 +13,9 @@
 		"email": "citrons915@gmail.com"
 	},
 	"main": "bin/index.js",
-	"tags": [],
+	"tags": [
+		"game"
+	],
 	"scene": {
 		"parcels": [
 			"0,0",

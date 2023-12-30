@@ -1,6 +1,6 @@
 import { Animator, engine, Entity, GltfContainer, Transform, TransformType } from '@dcl/sdk/ecs'
 
-import { defaultAnimation, modelFolders, playAnimation } from '../common'
+import { defaultAnimation, modelFolders } from '../common'
 
 export class Door {
   private entity: Entity
@@ -16,5 +16,5 @@ export class Door {
     this.entity = door
   }
 
-  open = () => playAnimation(this.entity)
+  open = () => Animator.playSingleAnimation(this.entity, defaultAnimation)
 }

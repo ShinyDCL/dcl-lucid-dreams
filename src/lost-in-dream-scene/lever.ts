@@ -1,6 +1,6 @@
 import { Animator, AudioSource, engine, Entity, GltfContainer, Transform, TransformType } from '@dcl/sdk/ecs'
 
-import { addInteraction, defaultAnimation, modelFolders, playAnimation, playSound, sounds } from '../common'
+import { addInteraction, defaultAnimation, modelFolders, playSound, sounds } from '../common'
 
 export class Lever {
   private entity: Entity
@@ -25,7 +25,7 @@ export class Lever {
   addOnClick = (hoverText: string, onClick: () => void) =>
     addInteraction(this.entity, hoverText, () => {
       playSound(this.entity)
-      playAnimation(this.entity)
+      Animator.playSingleAnimation(this.entity, defaultAnimation)
       onClick()
     })
 }

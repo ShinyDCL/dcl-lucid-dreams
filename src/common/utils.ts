@@ -1,7 +1,5 @@
-import { Animator, AudioSource, Entity, InputAction, pointerEventsSystem, Transform } from '@dcl/sdk/ecs'
+import { AudioSource, Entity, InputAction, pointerEventsSystem, Transform } from '@dcl/sdk/ecs'
 import { Vector3 } from '@dcl/sdk/math'
-
-import { defaultAnimation } from './resources'
 
 /*
  * Shuffles elements in array in random order
@@ -43,14 +41,4 @@ export const playSound = (entity: Entity) => {
 export const stopSound = (entity: Entity) => {
   const audioSource = AudioSource.getMutable(entity)
   audioSource.playing = false
-}
-
-export const playAnimation = (entity: Entity, clipName?: string) => {
-  const clip = Animator.getClip(entity, clipName || defaultAnimation)
-  clip.playing = true
-}
-
-export const stopAnimation = (entity: Entity, clipName?: string) => {
-  const clip = Animator.getClip(entity, clipName || defaultAnimation)
-  clip.playing = false
 }

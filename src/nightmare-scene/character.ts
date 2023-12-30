@@ -1,7 +1,7 @@
 import { Animator, engine, Entity, GltfContainer, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
-import { defaultAnimation, hideEntity, modelFolders, playAnimation, showEntity, stopAnimation } from '../common'
+import { defaultAnimation, hideEntity, modelFolders, showEntity } from '../common'
 
 export enum CharacterPart {
   Top = 'Top',
@@ -81,7 +81,7 @@ export class Character {
     if (!part) return
 
     showEntity(part.entity)
-    playAnimation(part.entity)
+    Animator.playSingleAnimation(part.entity, defaultAnimation)
   }
 
   /*
@@ -89,7 +89,7 @@ export class Character {
    */
   reset = () =>
     this.characterParts.forEach((part) => {
-      stopAnimation(part.entity)
+      Animator.stopAllAnimations(part.entity)
       hideEntity(part.entity)
     })
 
